@@ -39,8 +39,16 @@ const Auth = () => {
       alert('Please fill in all fields')
       return
     }
-    alert('Signed in successfully!')
-    navigate('/dashboard')
+    if (email == 'sachinbarvekar2003@gmail.com') {
+      localStorage.setItem('role', 'artist')
+      setRole('artist')
+      navigate('/onboarding')
+    } else {
+      localStorage.setItem('role', 'recruiter')
+      setRole('recruiter')
+      navigate('/dashboard')
+    }
+    alert(`Signed in successfully with ${role}`)
   }
 
   // simple client-side signup (mock)

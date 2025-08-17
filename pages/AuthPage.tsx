@@ -11,8 +11,6 @@ import {
   ArrowRight,
   Users,
   Star,
-  Zap,
-  Shield,
   Globe,
   Camera,
   Music,

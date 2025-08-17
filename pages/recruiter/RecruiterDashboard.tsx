@@ -148,7 +148,7 @@ const StatusBadge: React.FC<{ status: Applicant['status'] }> = ({ status }) => {
   )
 }
 
-export const DashboardPage = () => {
+export const RecruiterDashboard = () => {
   const navigate = useNavigate()
   const [applicants, setApplicants] = useState<Applicant[]>(initialApplicants)
   const latestApplicants = applicants.slice(0, 3)

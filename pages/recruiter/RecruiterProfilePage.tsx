@@ -129,7 +129,7 @@ const VerificationStatusCard: React.FC<{ status: VerificationStatus }> = ({
   )
 }
 
-export const ProfilePage = () => {
+export const RecruiterProfilePage = () => {
   const [recruiter, setRecruiter] = useState<Recruiter>(initialRecruiterData)
   const [formData, setFormData] = useState<Recruiter>(recruiter)
 
