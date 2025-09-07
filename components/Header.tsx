@@ -12,6 +12,8 @@ import {
   MenuIcon,
 } from './icons/IconComponents'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import userService from '@/services/userService'
 
 const initialNotifications: Notification[] = [
   {
@@ -255,12 +257,17 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   <CogIcon className='mr-3 h-5 w-5 text-gray-400' />
                   Settings
                 </button>
-                <a
-                  href='/'
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    userService.logout();
+                    toast.success('You have been logged out successfully');
+                    navigate('/auth');
+                  }}
                   className='flex items-center w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-t border-gray-100 mt-1 pt-2'>
                   <LogOutIcon className='mr-3 h-5 w-5 text-gray-400' />
                   Logout
-                </a>
+                </button>
               </div>
             </div>
           )}

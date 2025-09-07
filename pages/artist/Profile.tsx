@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import Icon from '@/components/Icon'
 import { ArtistCategory } from '@/types'
 
@@ -65,7 +66,28 @@ const Profile: React.FC = () => {
   }, [])
 
   const handleEditProfile = () => {
+    toast.info('Loading profile editor...')
     navigate('/artist/onboarding')
+  }
+
+  const handleViewDocument = (docType: string) => {
+    toast.info(`Viewing ${docType} document`)
+    // Add document viewing logic here
+  }
+
+  const handleUploadDocument = async (file: File, docType: string) => {
+    const toastId = toast.loading(`Uploading ${docType}...`)
+    try {
+      // Simulate upload
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      toast.dismiss(toastId)
+      toast.success(`${docType} uploaded successfully`)
+      // Refresh profile data or update state here
+    } catch (error) {
+      toast.dismiss(toastId)
+      toast.error(`Failed to upload ${docType}`)
+      console.error('Upload error:', error)
+    }
   }
 
   if (loading) {
