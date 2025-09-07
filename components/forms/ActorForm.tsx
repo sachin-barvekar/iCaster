@@ -14,34 +14,34 @@ const ActorForm: React.FC<FormProps> = ({
 }) => {
   return (
     <div className='space-y-6'>
-      <h3 className='text-xl font-bold border-b pb-2'>
+      <h3 className='text-xl font-bold border-b pb-2 text-gray-800'>
         Actor / Actress / Model Details
       </h3>
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
         <div>
-          <label className='block text-sm font-medium text-gray-700'>
+          <label className='block text-sm font-medium text-gray-600 mb-1.5'>
             Actor Type
           </label>
-          <div className='flex gap-4 mt-1 p-2 bg-gray-100 rounded-lg'>
-            <label className='flex-1 text-center p-2 rounded-md cursor-pointer has-[:checked]:bg-purple-600 has-[:checked]:text-white transition-colors'>
+          <div className='flex gap-4 mt-1 p-1.5 bg-gray-50 rounded-lg border border-gray-200'>
+            <label className='flex-1 text-center p-2 rounded-md cursor-pointer has-[:checked]:bg-primary has-[:checked]:text-white transition-colors'>
               <input
                 type='radio'
                 name='actorType'
                 value='skilled'
                 className='sr-only'
                 defaultChecked
-              />{' '}
-              Skilled Actor
+              />
+              <span className='text-sm font-medium'>Skilled Actor</span>
             </label>
-            <label className='flex-1 text-center p-2 rounded-md cursor-pointer has-[:checked]:bg-purple-600 has-[:checked]:text-white transition-colors'>
+            <label className='flex-1 text-center p-2 rounded-md cursor-pointer has-[:checked]:bg-primary has-[:checked]:text-white transition-colors'>
               <input
                 type='radio'
                 name='actorType'
                 value='known'
                 className='sr-only'
-              />{' '}
-              Known Actor
+              />
+              <span className='text-sm font-medium'>Known Actor</span>
             </label>
           </div>
           {errors?.actorType && (
@@ -57,7 +57,7 @@ const ActorForm: React.FC<FormProps> = ({
             placeholder='Age'
             value={formData.age || ''}
             onChange={e => updateFormData({ age: e.target.value })}
-            className='p-2 border rounded-md w-full'
+            className='p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
           />
           {errors?.age && (
             <p className='text-red-500 text-sm mt-1'>{errors.age}</p>
@@ -70,7 +70,7 @@ const ActorForm: React.FC<FormProps> = ({
             placeholder='Height (e.g., 5&apos;10")'
             value={formData.height || ''}
             onChange={e => updateFormData({ height: e.target.value })}
-            className='p-2 border rounded-md w-full'
+            className='p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
           />
           {errors?.height && (
             <p className='text-red-500 text-sm mt-1'>{errors.height}</p>
@@ -83,7 +83,7 @@ const ActorForm: React.FC<FormProps> = ({
             placeholder='Weight (kg)'
             value={formData.weight || ''}
             onChange={e => updateFormData({ weight: e.target.value })}
-            className='p-2 border rounded-md w-full'
+            className='p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
           />
           {errors?.weight && (
             <p className='text-red-500 text-sm mt-1'>{errors.weight}</p>

@@ -59,17 +59,17 @@ const CategoryCard: React.FC<{
     role='button'
     aria-pressed={isSelected}
     tabIndex={0}
-    className={`relative group p-4 border-2 rounded-2xl text-center cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+    className={`relative group p-4 border-2 rounded-2xl text-center cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
       isSelected
-        ? 'border-purple-600 bg-purple-50 shadow-lg scale-105'
-        : 'border-gray-200 bg-white hover:border-purple-400 hover:shadow-md'
+        ? 'border-primary bg-primary/10 shadow-lg scale-105'
+        : 'border-gray-200 bg-white hover:border-primary hover:shadow-md'
     }`}
     onClick={onSelect}
     onKeyDown={e => e.key === 'Enter' && onSelect()}>
     <Icon
       name={category.icon}
       size={40}
-      className='mx-auto text-purple-600 mb-3'
+      className='mx-auto text-primary mb-3'
     />
     <h3 className='font-bold text-sm text-gray-800 leading-tight'>
       {category.name}
@@ -172,7 +172,7 @@ const Step1_CategorySelect: React.FC<CategorySelectProps> = ({
           <button
             type='submit'
             disabled={!selectedCategory}
-            className='bg-purple-600 text-white font-bold py-3 px-12 rounded-lg shadow-md hover:bg-purple-700 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none'>
+            className='bg-primary text-white font-bold py-3 px-12 rounded-lg shadow-md hover:bg-primary/80 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none'>
             Continue
           </button>
         </div>

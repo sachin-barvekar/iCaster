@@ -92,7 +92,7 @@ const Messages: React.FC = () => {
               <button
                 onClick={() => setActiveChat(rec.id)}
                 className={`w-full text-left p-4 flex items-center gap-4 transition-colors ${
-                  activeChat === rec.id ? 'bg-violet-50' : 'hover:bg-gray-50'
+                  activeChat === rec.id ? 'bg-amber-50' : 'hover:bg-gray-50'
                 }`}>
                 <div className='relative'>
                   <img
@@ -109,7 +109,7 @@ const Messages: React.FC = () => {
                   <p className='text-sm text-gray-500'>{rec.company}</p>
                 </div>
                 {rec.unread > 0 && (
-                  <span className='bg-[#7C3AED] text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full'>
+                  <span className='bg-amber-600 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full'>
                     {rec.unread}
                   </span>
                 )}
@@ -131,13 +131,13 @@ const Messages: React.FC = () => {
                 </p>
               </div>
               <div className='flex items-center gap-4'>
-                <button className='text-gray-500 hover:text-[#7C3AED]'>
+                <button className='text-gray-500 hover:text-amber-600'>
                   <Icon name='Phone' size={20} />
                 </button>
-                <button className='text-gray-500 hover:text-[#7C3AED]'>
+                <button className='text-gray-500 hover:text-amber-600'>
                   <Icon name='Video' size={20} />
                 </button>
-                <button className='text-gray-500 hover:text-[#7C3AED]'>
+                <button className='text-gray-500 hover:text-amber-600'>
                   <Icon name='MoreVertical' size={20} />
                 </button>
               </div>
@@ -160,8 +160,8 @@ const Messages: React.FC = () => {
                     <div
                       className={`max-w-md p-3 rounded-2xl ${
                         msg.from === 'artist'
-                          ? 'bg-[#7C3AED] text-white rounded-br-none'
-                          : 'bg-gray-200 text-gray-800 rounded-bl-none'
+                          ? 'bg-amber-600 text-white rounded-br-none'
+                          : 'bg-gray-100 text-gray-800 rounded-bl-none border border-gray-200'
                       }`}>
                       <p>{msg.text}</p>
                     </div>
@@ -174,12 +174,12 @@ const Messages: React.FC = () => {
                 <input
                   type='text'
                   placeholder='Type a message...'
-                  className='w-full h-12 bg-gray-100 rounded-xl pl-12 pr-20 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]'
+                  className='w-full h-12 bg-gray-100 rounded-xl pl-12 pr-20 focus:outline-none focus:ring-2 focus:ring-amber-500'
                 />
-                <button className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#7C3AED]'>
+                <button className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-amber-600'>
                   <Icon name='Smile' size={22} />
                 </button>
-                <button className='absolute right-4 top-1/2 -translate-y-1/2 bg-gradient-to-r from-[#7C3AED] to-[#A78BFA] text-white p-2 rounded-lg'>
+                <button className='absolute right-4 top-1/2 -translate-y-1/2 bg-gradient-to-r from-amber-600 to-amber-500 text-white p-2 rounded-lg hover:from-amber-700 hover:to-amber-600 transition-colors'>
                   <Icon name='Send' size={20} />
                 </button>
               </div>

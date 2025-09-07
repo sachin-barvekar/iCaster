@@ -143,7 +143,7 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
         )
       default:
         return (
-          <div className='p-4 bg-yellow-100 text-yellow-800 rounded-lg flex items-center gap-2'>
+          <div className='p-4 bg-amber-50 text-amber-800 rounded-lg flex items-center gap-2'>
             <Icon name='AlertTriangle' />
             Please select a category first.
           </div>
@@ -158,7 +158,7 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
       </h2>
       <p className='text-gray-500 text-center mb-8'>
         Fill in your details for:{' '}
-        <span className='font-bold text-purple-700'>{formData.category}</span>
+        <span className='font-bold text-primary'>{formData.category}</span>
       </p>
 
       <form onSubmit={handleSubmit}>
@@ -181,7 +181,7 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
           <div className='flex flex-col sm:flex-row gap-4 w-full sm:w-auto'>
             <button
               type='submit'
-              className='bg-purple-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-purple-700 transition-all disabled:bg-gray-300 w-full sm:w-auto'>
+              className='bg-primary text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-primary/90 transition-all disabled:bg-gray-300 w-full sm:w-auto'>
               Review & Submit
             </button>
           </div>

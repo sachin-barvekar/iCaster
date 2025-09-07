@@ -59,10 +59,10 @@ const AppRouter = () =>
               path: '/bookmarks',
               element: <Bookmarks />,
             },
-            {
-              path: '/verified-badge',
-              element: <VerifiedBadge />,
-            },
+            // {
+            //   path: '/verified-badge',
+            //   element: <VerifiedBadge />,
+            // },
             {
               path: '/auditions',
               element: <Auditions />,

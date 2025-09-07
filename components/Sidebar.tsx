@@ -9,7 +9,7 @@ import {
   MicVocal,
   FileText,
   MessageSquare,
-} from "lucide-react";
+} from 'lucide-react'
 import {
   BriefcaseIcon,
   CreditCardIcon,
@@ -19,6 +19,7 @@ import {
   SearchIcon,
   XIcon,
 } from './icons/IconComponents'
+import logo from '../assets/icaster.png'
 
 interface SidebarProps {
   isOpen: boolean
@@ -41,11 +42,11 @@ const roleBasedNavItems: Record<
     { page: Page.Dashboard, icon: DashboardIcon, path: '/dashboard' },
     { page: Page.Jobs, icon: BriefcaseIcon, path: '/jobs' },
     { page: Page.Bookmarks, icon: Bookmark, path: '/bookmarks' },
-    {
-      page: Page.VerifiedBadge,
-      icon: BadgeCheck,
-      path: '/verified-badge',
-    },
+    // {
+    //   page: Page.VerifiedBadge,
+    //   icon: BadgeCheck,
+    //   path: '/verified-badge',
+    // },
     { page: Page.Auditions, icon: MicVocal, path: '/auditions' },
     { page: Page.Applications, icon: FileText, path: '/applications' },
     { page: Page.Messages, icon: MessageSquare, path: '/messages' },
@@ -77,8 +78,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       className={`fixed inset-y-0 left-0 bg-white border-r border-gray-200 flex flex-col z-40 w-64 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-      <div className='h-20 flex items-center justify-between px-6 shrink-0'>
-        <h1 className='text-xl font-bold text-primary'>iCaster</h1>
+      <div className='h-20 w-full flex items-center justify-between px-8 shrink-0'>
+        <div className='flex items-center'>
+          <img 
+            src={logo} 
+            alt='iCaster'
+            className='h-14 w-full object-contain' 
+          />
+        </div>
         <button
           onClick={() => setIsOpen(false)}
           className='lg:hidden p-1 text-gray-500 hover:text-gray-800'
@@ -86,8 +93,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           <XIcon className='h-6 w-6' />
         </button>
       </div>
+      
+      {/* Separator */}
+      <div className='px-4 py-2'>
+        <div className='border-t border-gray-200'></div>
+      </div>
 
-      <nav className='flex-1 px-4 py-4 overflow-y-auto'>
+      <nav className='flex-1 px-3 py-2 overflow-y-auto'>
         <ul>
           {navItems.map(item => {
             const Icon = item.icon

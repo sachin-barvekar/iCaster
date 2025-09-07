@@ -16,7 +16,7 @@ const StatusBadge: React.FC<{ status: Applicant['status'] }> = ({ status }) => {
     'px-2.5 py-1 text-xs font-semibold rounded-full inline-block'
   const statusClasses = {
     New: 'bg-blue-100 text-blue-800',
-    Viewed: 'bg-primary-light text-primary',
+    Viewed: 'bg-amber-100 text-amber-800',
     Interviewing: 'bg-yellow-100 text-yellow-800',
     Hired: 'bg-green-100 text-green-800',
     Rejected: 'bg-red-100 text-red-800',
@@ -52,7 +52,7 @@ export const ApplicantProfilePage = () => {
         </p>
         <button
           onClick={() => navigate(-1)}
-          className='mt-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-hover'>
+          className='mt-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700'>
           Go to Jobs
         </button>
       </div>
@@ -62,8 +62,8 @@ export const ApplicantProfilePage = () => {
   const Actions = () => {
     const baseButtonClasses =
       'w-full inline-flex justify-center items-center px-4 py-2.5 border text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2'
-    const primaryButtonClasses = `${baseButtonClasses} border-transparent text-white bg-primary hover:bg-primary-hover focus:ring-primary`
-    const secondaryButtonClasses = `${baseButtonClasses} border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-primary`
+    const primaryButtonClasses = `${baseButtonClasses} border-transparent text-white bg-amber-600 hover:bg-amber-700 focus:ring-amber-500`
+    const secondaryButtonClasses = `${baseButtonClasses} border-gray-300 text-gray-700 bg-white hover:bg-amber-50 focus:ring-amber-500`
     const hireButtonClasses = `${baseButtonClasses} border-transparent text-white bg-green-600 hover:bg-green-700 focus:ring-green-500`
 
     switch (applicant.status) {
@@ -214,7 +214,7 @@ export const ApplicantProfilePage = () => {
                   <MailIcon className='h-5 w-5 text-gray-400 mr-3' />
                   <a
                     href={`mailto:${applicant.email}`}
-                    className='text-primary hover:underline'>
+                    className='text-amber-600 hover:underline hover:text-amber-800'>
                     {applicant.email}
                   </a>
                 </li>
@@ -232,7 +232,7 @@ export const ApplicantProfilePage = () => {
                     href={applicant.portfolioUrl}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-primary hover:underline truncate'>
+                    className='text-amber-600 hover:underline hover:text-amber-800 truncate'>
                     {applicant.portfolioUrl.replace('https://', '')}
                   </a>
                 </li>

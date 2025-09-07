@@ -38,11 +38,11 @@ const DancerForm: React.FC<FormProps> = ({
 }) => {
   return (
     <div className='space-y-6'>
-      <h3 className='text-xl font-bold border-b pb-2'>
+      <h3 className='text-xl font-bold border-b pb-2 text-gray-800'>
         Dancer & Choreographer Details
       </h3>
       <div>
-        <label className='block text-sm font-medium text-gray-700 mb-1'>
+        <label className='block text-sm font-medium text-gray-600 mb-1.5'>
           Dance Styles
         </label>
         <div className='flex flex-wrap gap-2'>
@@ -70,7 +70,7 @@ const DancerForm: React.FC<FormProps> = ({
                     })
                   }
                 }}
-                className='rounded text-purple-600'
+                className='rounded text-primary focus:ring-primary'
               />
               <span>{style}</span>
             </label>
@@ -94,7 +94,7 @@ const DancerForm: React.FC<FormProps> = ({
           max='80'
           value={formData.experienceYears || ''}
           onChange={e => updateFormData({ experienceYears: e.target.value })}
-          className='w-1/3 p-2 mt-1 border rounded-md'
+          className='w-1/3 p-3 mt-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition'
         />
         {errors.experienceYears && (
           <p className='text-red-500 text-sm mt-1'>{errors.experienceYears}</p>

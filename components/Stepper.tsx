@@ -20,7 +20,7 @@ const Stepper: React.FC<StepperProps> = ({ currentStep }) => {
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 font-bold text-lg ${
                   currentStep >= step.number
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-primary text-white'
                     : 'bg-gray-200 text-gray-500'
                 }`}>
                 {currentStep > step.number ? (
@@ -32,7 +32,7 @@ const Stepper: React.FC<StepperProps> = ({ currentStep }) => {
               <p
                 className={`mt-2 font-semibold text-xs sm:text-sm ${
                   currentStep >= step.number
-                    ? 'text-purple-700'
+                    ? 'text-primary'
                     : 'text-gray-400'
                 }`}>
                 {step.title}
@@ -41,7 +41,7 @@ const Stepper: React.FC<StepperProps> = ({ currentStep }) => {
             {index < steps.length - 1 && (
               <div
                 className={`flex-1 h-1 transition-all duration-500 ${
-                  currentStep > step.number ? 'bg-purple-600' : 'bg-gray-200'
+                  currentStep > step.number ? 'bg-primary' : 'bg-gray-200'
                 }`}></div>
             )}
           </React.Fragment>

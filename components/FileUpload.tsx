@@ -49,8 +49,8 @@ const FileUpload: React.FC<FileUploadProps> = ({
         {...getRootProps()}
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
           isDragActive
-            ? 'border-purple-600 bg-purple-50'
-            : 'border-gray-300 hover:border-purple-400'
+            ? 'border-primary bg-primary/10'
+            : 'border-gray-300 hover:border-primary'
         }`}>
         <input {...getInputProps()} />
         <Icon
@@ -59,13 +59,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
           className='mx-auto text-gray-400 mb-2'
         />
         {isDragActive ? (
-          <p className='text-purple-600 font-semibold'>
+          <p className='text-primary font-semibold'>
             Drop the files here...
           </p>
         ) : (
           <p className='text-gray-500 text-sm'>
             Drag & drop files here, or{' '}
-            <span className='text-purple-600 font-semibold'>
+            <span className='text-primary font-semibold'>
               click to select
             </span>
           </p>

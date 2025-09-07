@@ -54,7 +54,7 @@ const CommonFields: React.FC<FormProps> = ({
               placeholder='Full Name'
               value={formData.fullName || ''}
               onChange={e => updateFormData({ fullName: e.target.value })}
-              className='p-2 border rounded-md w-full'
+              className='p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
             />
             {errors.fullName && (
               <p className='text-red-500 text-sm mt-1'>{errors.fullName}</p>
@@ -62,7 +62,7 @@ const CommonFields: React.FC<FormProps> = ({
           </div>
           <div>
             <select
-              className='p-2 border rounded-md w-full bg-white'
+              className='p-3 border border-gray-300 rounded-lg w-full bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition'
               value={formData.gender || ''}
               onChange={e => updateFormData({ gender: e.target.value })}>
               <option value=''>Select Gender</option>
@@ -80,7 +80,7 @@ const CommonFields: React.FC<FormProps> = ({
               placeholder='City'
               value={formData.city || ''}
               onChange={e => updateFormData({ city: e.target.value })}
-              className='p-2 border rounded-md w-full'
+              className='p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
             />
             {errors.city && (
               <p className='text-red-500 text-sm mt-1'>{errors.city}</p>
@@ -92,7 +92,7 @@ const CommonFields: React.FC<FormProps> = ({
               placeholder='Languages Known (comma-separated)'
               value={formData.languages || ''}
               onChange={e => updateFormData({ languages: e.target.value })}
-              className='p-2 border rounded-md w-full'
+              className='p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
             />
             {errors.languages && (
               <p className='text-red-500 text-sm mt-1'>{errors.languages}</p>
@@ -103,7 +103,7 @@ const CommonFields: React.FC<FormProps> = ({
               placeholder='Email Address'
               value={formData.email || ''}
               onChange={e => updateFormData({ email: e.target.value })}
-              className='p-2 border rounded-md w-full'
+              className='p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
             />
             {errors.email && (
               <p className='text-red-500 text-sm mt-1'>{errors.email}</p>
@@ -115,7 +115,7 @@ const CommonFields: React.FC<FormProps> = ({
               placeholder='Phone Number'
               value={formData.phone || ''}
               onChange={e => updateFormData({ phone: e.target.value })}
-              className='p-2 border rounded-md w-full'
+              className='p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
             />
             {errors.phone && (
               <p className='text-red-500 text-sm mt-1'>{errors.phone}</p>
@@ -146,18 +146,17 @@ const CommonFields: React.FC<FormProps> = ({
 
           <div className='space-y-4 pt-4 border-t'>
             <div className='flex items-start'>
-              <input
-                id='consent'
-                type='checkbox'
-                checked={formData.consent || false}
-                onChange={e => updateFormData({ consent: e.target.checked })}
-                className='h-4 w-4 text-purple-600 border-gray-300 rounded mt-1 focus:ring-purple-500'
-              />
-              <label
-                htmlFor='consent'
-                className='ml-3 block text-sm text-gray-900'>
-                I consent to the terms and conditions and allow ICASTAR to use
-                my information for verification purposes.
+              <div className='flex items-center h-5'>
+                <input
+                  type='checkbox'
+                  id='consent'
+                  checked={formData.consent || false}
+                  onChange={e => updateFormData({ consent: e.target.checked })}
+                  className='h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded'
+                />
+              </div>
+              <label htmlFor='consent' className='ml-2 block text-sm text-gray-700'>
+                I agree to the terms and conditions and privacy policy
               </label>
             </div>
 
@@ -169,7 +168,7 @@ const CommonFields: React.FC<FormProps> = ({
                 onChange={e =>
                   updateFormData({ marketingConsent: e.target.checked })
                 }
-                className='h-4 w-4 text-purple-600 border-gray-300 rounded mt-1 focus:ring-purple-500'
+                className='h-4 w-4 text-primary border-gray-300 rounded mt-1 focus:ring-primary'
               />
               <label
                 htmlFor='marketing'

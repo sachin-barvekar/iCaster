@@ -47,19 +47,19 @@ const BookmarkCard: React.FC<(typeof bookmarkedJobs)[0]> = ({
         alt={`${company} logo`}
         className='w-12 h-12 rounded-xl'
       />
-      <button className='text-gray-400 hover:text-red-500 transition-colors'>
+      <button className='text-gray-400 hover:text-amber-600 transition-colors'>
         <Icon name='Trash2' size={20} />
       </button>
     </div>
     <div className='mt-4'>
       <h3 className='text-xl font-bold'>{title}</h3>
       <p className='text-gray-500 font-medium'>{company}</p>
-      <div className='flex items-center text-gray-600 text-sm gap-2 mt-2'>
+      <div className='flex items-center text-amber-600 text-sm gap-2 mt-2'>
         <Icon name='MapPin' size={16} />
         <span>{location}</span>
       </div>
     </div>
-    <button className='w-full mt-6 bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition-all'>
+    <button className='w-full mt-6 bg-amber-50 text-amber-800 font-semibold py-3 px-6 rounded-xl hover:bg-amber-100 transition-all'>
       View Job
     </button>
   </div>
@@ -80,12 +80,14 @@ const Bookmarks: React.FC = () => {
       </div>
       {bookmarkedJobs.length === 0 && (
         <div className='text-center py-20 bg-white rounded-2xl shadow-lg'>
-          <Icon name='Bookmark' size={64} className='mx-auto text-gray-300' />
-          <h2 className='mt-4 text-2xl font-bold text-gray-700'>
+          <div className='bg-amber-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto'>
+            <Icon name='Bookmark' size={48} className='text-amber-400' />
+          </div>
+          <h2 className='mt-6 text-2xl font-bold text-gray-800'>
             No Bookmarks Yet
           </h2>
-          <p className='mt-2 text-gray-500'>
-            Start exploring jobs and save the ones you love!
+          <p className='mt-2 text-gray-500 max-w-md mx-auto'>
+            Start exploring jobs and save the ones you love! Your saved opportunities will appear here.
           </p>
         </div>
       )}

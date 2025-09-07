@@ -39,8 +39,8 @@ const AuditionItem: React.FC<(typeof auditions)[0]> = ({
   location,
   company,
 }) => (
-  <li className='bg-white/70 rounded-2xl p-5 flex items-center gap-5 hover:bg-white transition-colors duration-300 shadow-md'>
-    <div className='bg-violet-100 text-[#7C3AED] w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0'>
+  <li className='bg-white/90 rounded-2xl p-5 flex items-center gap-5 hover:bg-amber-50 transition-colors duration-300 shadow-md border border-amber-50'>
+    <div className='bg-amber-100 text-amber-800 w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0'>
       <Icon name={icon as any} size={32} />
     </div>
     <div className='flex-grow'>
@@ -48,7 +48,7 @@ const AuditionItem: React.FC<(typeof auditions)[0]> = ({
       <p className='text-sm text-gray-500'>{company}</p>
     </div>
     <div className='text-right flex-shrink-0'>
-      <p className='font-semibold text-[#7C3AED]'>{date}</p>
+      <p className='font-semibold text-amber-700'>{date}</p>
       <p className='text-sm text-gray-600 flex items-center justify-end gap-1'>
         <Icon name='MapPin' size={14} />
         {location}
@@ -74,8 +74,8 @@ const Auditions: React.FC = () => {
             onClick={() => setView('list')}
             className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
               view === 'list'
-                ? 'bg-[#7C3AED] text-white shadow'
-                : 'text-gray-600'
+                ? 'bg-amber-600 text-white shadow'
+                : 'text-gray-600 hover:bg-amber-50'
             }`}>
             <Icon name='List' size={20} className='inline mr-2' />
             List View
@@ -84,8 +84,8 @@ const Auditions: React.FC = () => {
             onClick={() => setView('map')}
             className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
               view === 'map'
-                ? 'bg-[#7C3AED] text-white shadow'
-                : 'text-gray-600'
+                ? 'bg-amber-600 text-white shadow'
+                : 'text-gray-600 hover:bg-amber-50'
             }`}>
             <Icon name='Map' size={20} className='inline mr-2' />
             Map View

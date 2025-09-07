@@ -10,11 +10,11 @@ const ArtistIllustration: React.FC = () => (
     <g transform='translate(100 100)'>
       <path
         d='M0 -70 C40 -70, 60 -40, 60 0 C60 50, 30 70, 0 80 C-30 70, -60 50, -60 0 C-60 -40, -40 -70, 0 -70'
-        fill='#EDE9FE'
+        fill='#FEF3C7'
       />
       <path
         d='M-35 -10 Q-20 -40 0 -40 Q20 -40 35 -10'
-        stroke='#7C3AED'
+        stroke='#F59E0B'
         strokeWidth='4'
         fill='none'
         strokeLinecap='round'
@@ -28,16 +28,16 @@ const ArtistIllustration: React.FC = () => (
         fill='none'
         strokeLinecap='round'
       />
-      <path d='M-70 70 L-60 20 L0 -10 L60 20 L70 70 Z' fill='#A78BFA' />
+      <path d='M-70 70 L-60 20 L0 -10 L60 20 L70 70 Z' fill='#FBBF24' />
       <path
         d='M0 80 Q-20 95, -40 85'
-        stroke='#7C3AED'
+        stroke='#D97706'
         strokeWidth='3'
         fill='none'
       />
       <path
         d='M0 80 Q20 95, 40 85'
-        stroke='#7C3AED'
+        stroke='#D97706'
         strokeWidth='3'
         fill='none'
       />
@@ -51,11 +51,11 @@ const ProfileChecklistItem: React.FC<{ title: string; completed: boolean }> = ({
 }) => (
   <div
     className={`flex items-center p-4 rounded-2xl transition-all ${
-      completed ? 'bg-violet-100' : 'bg-white'
+      completed ? 'bg-amber-50' : 'bg-white'
     }`}>
     <div
       className={`flex items-center justify-center w-8 h-8 rounded-full mr-4 ${
-        completed ? 'bg-[#7C3AED]' : 'bg-gray-200'
+        completed ? 'bg-primary' : 'bg-gray-200'
       }`}>
       <Icon
         name={completed ? 'Check' : 'X'}
@@ -65,7 +65,7 @@ const ProfileChecklistItem: React.FC<{ title: string; completed: boolean }> = ({
     </div>
     <span
       className={`font-medium ${
-        completed ? 'text-[#7C3AED]' : 'text-gray-600'
+        completed ? 'text-primary' : 'text-gray-600'
       }`}>
       {title}
     </span>
@@ -97,7 +97,7 @@ const ArtistDashboard: React.FC = () => {
             Your journey to the spotlight continues here. Complete your profile
             to get noticed by top recruiters.
           </p>
-          <button className='mt-6 bg-gradient-to-r from-[#7C3AED] to-[#A78BFA] text-white font-semibold py-3 px-6 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all'>
+          <button className='mt-6 bg-gradient-to-r from-primary to-amber-500 text-white font-semibold py-3 px-6 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all'>
             View Job Matches
           </button>
         </div>
@@ -114,10 +114,10 @@ const ArtistDashboard: React.FC = () => {
         <div className='flex items-center gap-4 mb-6'>
           <div className='w-full bg-gray-200 rounded-full h-4'>
             <div
-              className='bg-gradient-to-r from-[#7C3AED] to-[#A78BFA] h-4 rounded-full transition-all duration-500'
+              className='bg-gradient-to-r from-primary to-amber-500 h-4 rounded-full transition-all duration-500'
               style={{ width: `${completionPercentage}%` }}></div>
           </div>
-          <span className='font-bold text-[#7C3AED]'>
+          <span className='font-bold text-primary'>
             {Math.round(completionPercentage)}%
           </span>
         </div>
