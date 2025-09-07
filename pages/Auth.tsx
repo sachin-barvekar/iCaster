@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type FormEvent, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,8 +19,22 @@ import {
   SelectItem,
   SelectValue,
 } from '@/components/ui/select'
-import { Eye, EyeOff, Star, Camera, Users, ArrowLeft } from 'lucide-react'
+import {
+  Eye,
+  EyeOff,
+  Star,
+  Camera,
+  Users,
+  ArrowLeft,
+  Loader2,
+} from 'lucide-react'
 import heroBg from '@/assets/hero-stage.jpg'
+import authService, {
+  type LoginRequest,
+  type RegisterRequest,
+} from '@/services/userService'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const Auth = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -29,37 +43,117 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [name, setName] = useState('')
   const [role, setRole] = useState<'artist' | 'recruiter'>('artist')
-
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [isLoading, setIsLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState('signin')
   const navigate = useNavigate()
 
-  // simple client-side login (mock)
-  const handleSignIn = e => {
-    e.preventDefault()
-    if (!email || !password) {
-      alert('Please fill in all fields')
-      return
+  // Clear errors when switching tabs
+  useEffect(() => {
+    setErrors({})
+  }, [activeTab])
+
+  const validateSignIn = (): boolean => {
+    const newErrors: Record<string, string> = {}
+    if (!email.trim()) {
+      newErrors.email = 'Email is required'
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Please enter a valid email'
     }
-    if (email == 'sachinbarvekar2003@gmail.com') {
-      localStorage.setItem('role', 'artist')
-      setRole('artist')
-      navigate('/onboarding')
-    } else {
-      localStorage.setItem('role', 'recruiter')
-      setRole('recruiter')
-      navigate('/dashboard')
+    if (!password) {
+      newErrors.password = 'Password is required'
+    } else if (password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters'
     }
-    alert(`Signed in successfully with ${role}`)
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
   }
 
-  // simple client-side signup (mock)
-  const handleSignUp = e => {
+  const handleSignIn = async (e: FormEvent) => {
     e.preventDefault()
-    if (password !== confirmPassword) {
-      alert('Passwords do not match!')
-      return
+    if (!validateSignIn()) return
+    setIsLoading(true)
+    try {
+      const credentials: LoginRequest = { email, password }
+      const { token, user } = await authService.login(credentials)
+
+      const userRole = user.roles?.[0] || 'artist'
+      localStorage.setItem('role', userRole)
+      setRole(userRole as 'artist' | 'recruiter')
+
+      toast.success('You have successfully logged in!')
+      navigate(userRole === 'artist' ? '/onboarding' : '/dashboard')
+    } catch (error) {
+      console.error('Sign in failed:', error)
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Sign in failed. Please try again.'
+      toast.error(errorMessage)
+    } finally {
+      setIsLoading(false)
     }
-    alert(`Account created for ${name} as ${role}`)
-    navigate('/dashboard')
+  }
+
+  const validateSignUp = (): boolean => {
+    const newErrors: Record<string, string> = {}
+
+    if (!name.trim()) {
+      newErrors.name = 'Full name is required'
+    }
+    if (!email.trim()) {
+      newErrors.email = 'Email is required'
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Please enter a valid email'
+    }
+    if (!password) {
+      newErrors.password = 'Password is required'
+    } else if (password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters'
+    }
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password'
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match'
+    }
+    if (!role) {
+      newErrors.role = 'Role is required'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSignUp = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!validateSignUp()) return
+    setIsLoading(true)
+    try {
+      const userData: RegisterRequest = {
+        email,
+        password,
+        fullName: name,
+        role,
+      }
+      await authService.register(userData)
+
+      const { user } = await authService.login({ email, password })
+      const userRole = user.roles?.[0] || 'artist'
+      localStorage.setItem('role', userRole)
+      setRole(userRole as 'artist' | 'recruiter')
+
+      toast.success('Your account has been created successfully!')
+      navigate(userRole === 'artist' ? '/onboarding' : '/dashboard')
+    } catch (error) {
+      console.error('Sign up failed:', error)
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to create account. Please try again.'
+      toast.error(errorMessage)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -71,8 +165,7 @@ const Auth = () => {
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
       }}>
-      {/* Background overlay with gradient */}
-      <div className='absolute inset-0 bg-gradient-to-br from-purple-900/20 via-pink-900/10 to-yellow-900/5' />
+      <div className='absolute inset-0 bg-gradient-to-br from-neutral-950 via-neutral-900 to-black opacity-90' />
 
       {/* Floating elements */}
       <div className='absolute top-20 left-20 w-32 h-32 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full blur-xl' />
@@ -91,6 +184,7 @@ const Auth = () => {
             </Button>
           </Link>
         </div>
+
         <Card className='backdrop-blur-lg bg-white/10 border-white/20 shadow-2xl'>
           <CardHeader className='text-center pb-4'>
             <div className='flex justify-center mb-4'>
@@ -107,7 +201,11 @@ const Auth = () => {
           </CardHeader>
 
           <CardContent>
-            <Tabs defaultValue='signin' className='w-full'>
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              defaultValue='signin'
+              className='w-full'>
               <TabsList className='grid w-full grid-cols-2 bg-white/10 border border-white/20'>
                 <TabsTrigger
                   value='signin'
@@ -125,24 +223,42 @@ const Auth = () => {
               <TabsContent value='signin'>
                 <form onSubmit={handleSignIn} className='space-y-4'>
                   <div className='space-y-2'>
-                    <Label htmlFor='signin-email' className='text-white/90'>
-                      Email
-                    </Label>
+                    <div className='flex justify-between items-center'>
+                      {' '}
+                      <Label htmlFor='signin-email' className='text-white/90'>
+                        {' '}
+                        Email{' '}
+                      </Label>{' '}
+                      {errors.email && (
+                        <span className='text-xs text-red-400'>
+                          {errors.email}
+                        </span>
+                      )}{' '}
+                    </div>
                     <Input
                       id='signin-email'
-                      type='email'
                       placeholder='Enter your email'
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      className='bg-white/10 border-white/20 text-white placeholder:text-white/50'
-                      required
+                      className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 ${
+                        errors.email ? 'border-red-500' : ''
+                      }`}
                     />
                   </div>
 
                   <div className='space-y-2'>
-                    <Label htmlFor='signin-password' className='text-white/90'>
-                      Password
-                    </Label>
+                    <div className='flex justify-between items-center'>
+                      <Label
+                        htmlFor='signin-password'
+                        className='text-white/90'>
+                        Password
+                      </Label>
+                      {errors.password && (
+                        <span className='text-xs text-red-400'>
+                          {errors.password}
+                        </span>
+                      )}{' '}
+                    </div>
                     <div className='relative'>
                       <Input
                         id='signin-password'
@@ -150,8 +266,9 @@ const Auth = () => {
                         placeholder='Enter your password'
                         value={password}
                         onChange={e => setPassword(e.target.value)}
-                        className='bg-white/10 border-white/20 text-white placeholder:text-white/50 pr-10'
-                        required
+                        className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 pr-10 ${
+                          errors.password ? 'border-red-500' : ''
+                        }`}
                       />
                       <Button
                         type='button'
@@ -170,8 +287,16 @@ const Auth = () => {
 
                   <Button
                     type='submit'
-                    className='w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white h-11'>
-                    Sign In
+                    disabled={isLoading}
+                    className='w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white h-11 hover:from-purple-700 hover:to-pink-700 disabled:opacity-70'>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                        Signing in...
+                      </>
+                    ) : (
+                      'Sign In'
+                    )}
                   </Button>
                 </form>
               </TabsContent>
@@ -180,58 +305,99 @@ const Auth = () => {
               <TabsContent value='signup'>
                 <form onSubmit={handleSignUp} className='space-y-4'>
                   <div className='space-y-2'>
-                    <Label htmlFor='signup-name' className='text-white/90'>
-                      Full Name
-                    </Label>
+                    <div className='flex justify-between items-center'>
+                      <Label htmlFor='signup-name' className='text-white/90'>
+                        Full Name
+                      </Label>
+                      {errors.name && (
+                        <span className='text-xs text-red-400'>
+                          {errors.name}
+                        </span>
+                      )}
+                    </div>
                     <Input
                       id='signup-name'
                       type='text'
                       placeholder='Enter your full name'
                       value={name}
                       onChange={e => setName(e.target.value)}
-                      className='bg-white/10 border-white/20 text-white placeholder:text-white/50'
-                      required
+                      className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 ${
+                        errors.name ? 'border-red-500' : ''
+                      }`}
                     />
                   </div>
 
                   <div className='space-y-2'>
-                    <Label htmlFor='signup-role' className='text-white/90'>
-                      Role
-                    </Label>
+                    <div className='flex justify-between items-center'>
+                      <Label htmlFor='signup-role' className='text-white/90'>
+                        Role
+                      </Label>
+                      {errors.role && (
+                        <span className='text-xs text-red-400'>
+                          {errors.role}
+                        </span>
+                      )}
+                    </div>
                     <Select
                       value={role}
                       onValueChange={v => setRole(v as 'artist' | 'recruiter')}>
                       <SelectTrigger
                         id='signup-role'
-                        className='bg-white/10 border-white/20 text-white'>
+                        className='w-full bg-white/10 border border-white/20 text-white px-3 py-2 rounded-lg 
+               hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+               focus:ring-offset-gray-900 transition'>
                         <SelectValue placeholder='Select your role' />
                       </SelectTrigger>
-                      <SelectContent className='bg-purple-500 text-white'>
-                        <SelectItem value='artist'>Artist</SelectItem>
-                        <SelectItem value='recruiter'>Recruiter</SelectItem>
+                      <SelectContent className='bg-gray-900 border border-gray-700 text-white rounded-lg shadow-lg'>
+                        <SelectItem
+                          value='artist'
+                          className='cursor-pointer hover:bg-white/10'>
+                          Artist
+                        </SelectItem>
+                        <SelectItem
+                          value='recruiter'
+                          className='cursor-pointer hover:bg-white/10'>
+                          Recruiter
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className='space-y-2'>
-                    <Label htmlFor='signup-email' className='text-white/90'>
-                      Email
-                    </Label>
+                    <div className='flex justify-between items-center'>
+                      <Label htmlFor='signup-email' className='text-white/90'>
+                        Email
+                      </Label>
+                      {errors.email && (
+                        <span className='text-xs text-red-400'>
+                          {errors.email}
+                        </span>
+                      )}
+                    </div>
                     <Input
                       id='signup-email'
-                      type='email'
                       placeholder='Enter your email'
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      className='bg-white/10 border-white/20 text-white placeholder:text-white/50'
-                      required
+                      className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 ${
+                        errors.email ? 'border-red-500' : ''
+                      }`}
                     />
                   </div>
 
                   <div className='space-y-2'>
-                    <Label htmlFor='signup-password' className='text-white/90'>
-                      Password
-                    </Label>
+                    <div className='flex justify-between items-center'>
+                      <Label
+                        htmlFor='signup-password'
+                        className='text-white/90'>
+                        Password
+                      </Label>
+                      {errors.password && (
+                        <span className='text-xs text-red-400'>
+                          {errors.password}
+                        </span>
+                      )}
+                    </div>
                     <div className='relative'>
                       <Input
                         id='signup-password'
@@ -239,8 +405,9 @@ const Auth = () => {
                         placeholder='Create a password'
                         value={password}
                         onChange={e => setPassword(e.target.value)}
-                        className='bg-white/10 border-white/20 text-white placeholder:text-white/50 pr-10'
-                        required
+                        className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 pr-10 ${
+                          errors.password ? 'border-red-500' : ''
+                        }`}
                       />
                       <Button
                         type='button'
@@ -258,24 +425,42 @@ const Auth = () => {
                   </div>
 
                   <div className='space-y-2'>
-                    <Label htmlFor='confirm-password' className='text-white/90'>
-                      Confirm Password
-                    </Label>
+                    <div className='flex justify-between items-center'>
+                      <Label
+                        htmlFor='confirm-password'
+                        className='text-white/90'>
+                        Confirm Password
+                      </Label>
+                      {errors.confirmPassword && (
+                        <span className='text-xs text-red-400'>
+                          {errors.confirmPassword}
+                        </span>
+                      )}
+                    </div>
                     <Input
                       id='confirm-password'
                       type='password'
                       placeholder='Confirm your password'
                       value={confirmPassword}
                       onChange={e => setConfirmPassword(e.target.value)}
-                      className='bg-white/10 border-white/20 text-white placeholder:text-white/50'
-                      required
+                      className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 ${
+                        errors.confirmPassword ? 'border-red-500' : ''
+                      }`}
                     />
                   </div>
 
                   <Button
                     type='submit'
-                    className='w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white h-11'>
-                    Create Account
+                    disabled={isLoading}
+                    className='w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white h-11 hover:from-purple-700 hover:to-pink-700 disabled:opacity-70'>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                        Creating account...
+                      </>
+                    ) : (
+                      'Create Account'
+                    )}
                   </Button>
                 </form>
               </TabsContent>

@@ -21,10 +21,6 @@ import Auditions from '@/pages/artist/Auditions'
 import Applications from '@/pages/artist/Applications'
 import Messages from '@/pages/artist/Messages'
 import ProfileIndex from '@/pages/ProfileIndex'
-import OnboardingLayout from '@/layouts/OnboardingLayout'
-import Step1_CategorySelect from '@/pages/artist/Step1_CategorySelect'
-import Step2_ProfileForm from '@/pages/artist/Step2_ProfileForm'
-import Step3_Completion from '@/pages/artist/Step3_Completion'
 import ArtistRegistrationForm from '@/pages/artist/ArtistRegistrationForm'
 
 const AppRouter = () =>
@@ -42,8 +38,7 @@ const AppRouter = () =>
         },
         {
           path: '/onboarding',
-          element: <OnboardingLayout />,
-          children: [{ index: true, element: <ArtistRegistrationForm /> }],
+          element: <ArtistRegistrationForm />,
         },
         {
           element: <DashLayout />,

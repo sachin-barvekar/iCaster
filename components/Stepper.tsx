@@ -8,7 +8,6 @@ interface StepperProps {
 const steps = [
   { number: 1, title: 'Category' },
   { number: 2, title: 'Profile Details' },
-  { number: 3, title: 'Completion' },
 ]
 
 const Stepper: React.FC<StepperProps> = ({ currentStep }) => {

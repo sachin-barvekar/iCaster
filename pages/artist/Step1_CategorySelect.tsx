@@ -1,72 +1,57 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ArtistCategory } from '@/types'
 import Icon, { IconName } from '@/components/Icon'
-import { useNavigate } from 'react-router-dom'
+import { onboardingService } from '@/services/onboardingService'
+import { toast } from 'react-toastify'
 
 interface CategorySelectProps {
   onNext: () => void
   updateFormData: (data: { category: ArtistCategory }) => void
 }
 
-const categories: {
+interface Category {
+  id: string
   name: ArtistCategory
   icon: IconName
   description: string
-}[] = [
+}
+
+// Fallback categories in case API fails
+const fallbackCategories: Category[] = [
   {
+    id: '1',
     name: ArtistCategory.Actor,
     icon: 'User',
     description: 'Acting, modeling, and performance roles.',
   },
   {
+    id: '2',
     name: ArtistCategory.Dancer,
     icon: 'PersonStanding',
     description: 'For dancers and choreographers.',
   },
   {
+    id: '3',
     name: ArtistCategory.Director,
     icon: 'Clapperboard',
     description: 'Film, TV, and stage directors.',
   },
   {
-    name: ArtistCategory.Writer,
-    icon: 'PenSquare',
-    description: 'Screenwriters, lyricists, and more.',
-  },
-  {
-    name: ArtistCategory.Makeup,
-    icon: 'Paintbrush2',
-    description: 'Makeup artists and hair stylists.',
-  },
-  {
+    id: '4',
     name: ArtistCategory.Singer,
     icon: 'Mic',
-    description: 'Vocalists and singers of all genres.',
+    description: 'Vocal artists and singers.',
   },
   {
+    id: '5',
     name: ArtistCategory.Musician,
     icon: 'Music',
     description: 'Instrumentalists and musicians.',
   },
-  {
-    name: ArtistCategory.Comedian,
-    icon: 'Smile',
-    description: 'Stand-up comedians and performers.',
-  },
-  {
-    name: ArtistCategory.Band,
-    icon: 'Users',
-    description: 'For music bands and groups.',
-  },
-  {
-    name: ArtistCategory.DJ_RJ,
-    icon: 'Disc3',
-    description: 'DJs and Radio Jockeys.',
-  },
 ]
 
 const CategoryCard: React.FC<{
-  category: (typeof categories)[0]
+  category: Category
   isSelected: boolean
   onSelect: () => void
 }> = ({ category, isSelected, onSelect }) => (
@@ -99,49 +84,99 @@ const Step1_CategorySelect: React.FC<CategorySelectProps> = ({
   onNext,
   updateFormData,
 }) => {
+  const [categories, setCategories] = useState<Category[]>(fallbackCategories)
+  const [isLoading, setIsLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] =
     useState<ArtistCategory | null>(null)
-  const navigate = useNavigate()
 
-  const handleSelect = (category: ArtistCategory) => {
-    setSelectedCategory(category)
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        // const data = await onboardingService.getCategories()
+        // // Map API response to our expected format
+        // const mappedCategories = data.map(cat => ({
+        //   id: cat.id,
+        //   name: cat.name as ArtistCategory,
+        //   icon: mapCategoryToIcon(cat.name as ArtistCategory),
+        //   description: cat.description,
+        // }))
+        setCategories(fallbackCategories)
+      } catch (error) {
+        console.error('Failed to load categories, using fallback', error)
+        // toast.error('Failed to load categories. Using default options.');
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  const mapCategoryToIcon = (category: ArtistCategory): IconName => {
+    const iconMap: Partial<Record<ArtistCategory, IconName>> = {
+      [ArtistCategory.Actor]: 'User',
+      [ArtistCategory.Dancer]: 'PersonStanding',
+      [ArtistCategory.Director]: 'Clapperboard',
+      [ArtistCategory.Singer]: 'Mic',
+      [ArtistCategory.Musician]: 'Music',
+    }
+    return iconMap[category] || 'User'
   }
 
-  const handleContinue = () => {
-    if (selectedCategory) {
-      updateFormData({ category: selectedCategory })
-      onNext()
+  const handleCategorySelect = (category: ArtistCategory) => {
+    setSelectedCategory(category)
+    updateFormData({ category })
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedCategory) {
+      toast.error('Please select a category to continue')
+      return
     }
+    onNext()
+  }
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center min-h-[400px]'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500' />
+      </div>
+    )
   }
 
   return (
     <div className='bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-5xl mx-auto'>
-      <h2 className='text-2xl sm:text-3xl font-bold text-center mb-2'>
-        Choose your artist category
-      </h2>
-      <p className='text-gray-500 text-center mb-8'>
-        Select the category that best represents you.
-      </p>
+      <form onSubmit={handleSubmit} className='space-y-8'>
+        <div className='space-y-2'>
+          <h2 className='text-2xl sm:text-3xl font-bold text-center mb-2'>
+            Choose your artist category
+          </h2>
+          <p className='text-gray-500 text-center mb-8'>
+            Select the category that best represents you.
+          </p>
+        </div>
 
-      <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6'>
-        {categories.map(cat => (
-          <CategoryCard
-            key={cat.name}
-            category={cat}
-            isSelected={selectedCategory === cat.name}
-            onSelect={() => handleSelect(cat.name)}
-          />
-        ))}
-      </div>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+          {categories.map(category => (
+            <CategoryCard
+              key={category.id}
+              category={category}
+              isSelected={selectedCategory === category.name}
+              onSelect={() => handleCategorySelect(category.name)}
+            />
+          ))}
+        </div>
 
-      <div className='mt-10 text-center'>
-        <button
-          onClick={handleContinue}
-          disabled={!selectedCategory}
-          className='bg-purple-600 text-white font-bold py-3 px-12 rounded-lg shadow-md hover:bg-purple-700 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none'>
-          Continue
-        </button>
-      </div>
+        <div className='flex justify-end space-x-4 pt-4'>
+          <button
+            type='submit'
+            disabled={!selectedCategory}
+            className='bg-purple-600 text-white font-bold py-3 px-12 rounded-lg shadow-md hover:bg-purple-700 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none'>
+            Continue
+          </button>
+        </div>
+      </form>
     </div>
   )
 }
