@@ -26,7 +26,8 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest extends LoginRequest {
-  fullName: string
+  firstName: string
+  lastName:string
   phone?: string
   role: string
 }
@@ -35,7 +36,7 @@ export interface RegisterRequest extends LoginRequest {
 export const authService = {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>('/api/login', credentials)
+      const response = await api.post<AuthResponse>('/auth/login', credentials)
       const { token, refreshToken, user } = response.data
 
       // Store tokens and user data
@@ -62,7 +63,7 @@ export const authService = {
 
   async register(userData: RegisterRequest): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>('/api/register', userData)
+      const response = await api.post<AuthResponse>('/auth/register', userData)
       return response.data
     } catch (error) {
       console.error('Registration failed:', error)

@@ -41,8 +41,9 @@ const Auth = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [name, setName] = useState('')
-  const [role, setRole] = useState<'artist' | 'recruiter'>('artist')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [role, setRole] = useState<'ARTIST' | 'RECRUITER'>('ARTIST')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('signin')
@@ -98,8 +99,11 @@ const Auth = () => {
   const validateSignUp = (): boolean => {
     const newErrors: Record<string, string> = {}
 
-    if (!name.trim()) {
-      newErrors.name = 'Full name is required'
+    if (!firstName.trim()) {
+      newErrors.name = 'First name is required'
+    }
+    if (!lastName.trim()) {
+      newErrors.name = 'Last name is required'
     }
     if (!email.trim()) {
       newErrors.email = 'Email is required'
@@ -132,7 +136,8 @@ const Auth = () => {
       const userData: RegisterRequest = {
         email,
         password,
-        fullName: name,
+        firstName,
+        lastName,
         role,
       }
       await authService.register(userData)
@@ -287,7 +292,9 @@ const Auth = () => {
                     )}
                   </Button>
                   <div className='mt-6 pt-4 border-t border-white/10 text-center'>
-                    <Link to='/' className='inline-flex items-center text-sm text-white/60 hover:text-white/90 transition-colors'>
+                    <Link
+                      to='/'
+                      className='inline-flex items-center text-sm text-white/60 hover:text-white/90 transition-colors'>
                       <ArrowLeft className='h-3.5 w-3.5 mr-1.5' />
                       Back to Home
                     </Link>
@@ -300,26 +307,52 @@ const Auth = () => {
                 <form onSubmit={handleSignUp} className='space-y-4'>
                   <div className='space-y-4'>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      {/* Name Field */}
+                      {/* first Name Field */}
                       <div className='space-y-2 md:col-span-2'>
                         <div className='flex justify-between items-center'>
-                          <Label htmlFor='signup-name' className='text-white/90'>
-                            Full Name
+                          <Label
+                            htmlFor='signup-firstName'
+                            className='text-white/90'>
+                            First Name
                           </Label>
-                          {errors.name && (
+                          {errors.firstName && (
                             <span className='text-xs text-red-400'>
-                              {errors.name}
+                              {errors.firstName}
                             </span>
                           )}
                         </div>
                         <Input
                           id='signup-name'
                           type='text'
-                          placeholder='Enter your full name'
-                          value={name}
-                          onChange={e => setName(e.target.value)}
+                          placeholder='Enter your first name'
+                          value={firstName}
+                          onChange={e => setFirstName(e.target.value)}
                           className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 ${
                             errors.name ? 'border-red-500' : ''
+                          }`}
+                        />
+                      </div>
+                      <div className='space-y-2 md:col-span-2'>
+                        <div className='flex justify-between items-center'>
+                          <Label
+                            htmlFor='signup-lastName'
+                            className='text-white/90'>
+                            Last Name
+                          </Label>
+                          {errors.lastName && (
+                            <span className='text-xs text-red-400'>
+                              {errors.lastName}
+                            </span>
+                          )}
+                        </div>
+                        <Input
+                          id='signup-name'
+                          type='text'
+                          placeholder='Enter your last name'
+                          value={lastName}
+                          onChange={e => setLastName(e.target.value)}
+                          className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 ${
+                            errors.lastName ? 'border-red-500' : ''
                           }`}
                         />
                       </div>
@@ -327,7 +360,9 @@ const Auth = () => {
                       {/* Email Field */}
                       <div className='space-y-2'>
                         <div className='flex justify-between items-center'>
-                          <Label htmlFor='signup-email' className='text-white/90'>
+                          <Label
+                            htmlFor='signup-email'
+                            className='text-white/90'>
                             Email
                           </Label>
                           {errors.email && (
@@ -350,7 +385,9 @@ const Auth = () => {
                       {/* Role Field */}
                       <div className='space-y-2'>
                         <div className='flex justify-between items-center'>
-                          <Label htmlFor='signup-role' className='text-white/90'>
+                          <Label
+                            htmlFor='signup-role'
+                            className='text-white/90'>
                             Role
                           </Label>
                           {errors.role && (
@@ -361,7 +398,9 @@ const Auth = () => {
                         </div>
                         <Select
                           value={role}
-                          onValueChange={v => setRole(v as 'artist' | 'recruiter')}>
+                          onValueChange={v =>
+                            setRole(v as 'ARTIST' | 'RECRUITER')
+                          }>
                           <SelectTrigger
                             id='signup-role'
                             className='w-full bg-white/10 border border-white/20 text-white px-3 py-2 rounded-lg 
@@ -371,12 +410,12 @@ const Auth = () => {
                           </SelectTrigger>
                           <SelectContent className='bg-gray-900 border border-gray-700 text-white rounded-lg shadow-lg'>
                             <SelectItem
-                              value='artist'
+                              value='ARTIST'
                               className='cursor-pointer hover:bg-white/10'>
                               Artist
                             </SelectItem>
                             <SelectItem
-                              value='recruiter'
+                              value='RECRUITER'
                               className='cursor-pointer hover:bg-white/10'>
                               Recruiter
                             </SelectItem>
@@ -388,7 +427,9 @@ const Auth = () => {
                     {/* Password Field - Full Width */}
                     <div className='space-y-2'>
                       <div className='flex justify-between items-center'>
-                        <Label htmlFor='signup-password' className='text-white/90'>
+                        <Label
+                          htmlFor='signup-password'
+                          className='text-white/90'>
                           Password
                         </Label>
                         {errors.password && (
@@ -426,7 +467,9 @@ const Auth = () => {
                     {/* Confirm Password Field - Full Width */}
                     <div className='space-y-2'>
                       <div className='flex justify-between items-center'>
-                        <Label htmlFor='confirm-password' className='text-white/90'>
+                        <Label
+                          htmlFor='confirm-password'
+                          className='text-white/90'>
                           Confirm Password
                         </Label>
                         {errors.confirmPassword && (
@@ -462,7 +505,9 @@ const Auth = () => {
                     )}
                   </Button>
                   <div className='mt-6 pt-4 border-t border-white/10 text-center'>
-                    <Link to='/' className='inline-flex items-center text-sm text-white/60 hover:text-white/90 transition-colors'>
+                    <Link
+                      to='/'
+                      className='inline-flex items-center text-sm text-white/60 hover:text-white/90 transition-colors'>
                       <ArrowLeft className='h-3.5 w-3.5 mr-1.5' />
                       Back to Home
                     </Link>
