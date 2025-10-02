@@ -6,17 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import {
-  ArrowRight,
-  Users,
-  Star,
-  Globe,
-  Camera,
-  Music,
-  Mic,
-} from 'lucide-react'
+import { ArrowRight, Users, Star, Camera, Music } from 'lucide-react'
 import { useState, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import heroBg from '../../assets/hero-stage.jpg'
 import logo from '../../assets/icaster.png'
 import ctaBg from '../../assets/cta-bg.jpg'
@@ -25,6 +17,7 @@ import { features, roles } from './utils'
 const AuthPage = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null)
   const rolesSectionRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
   return (
     <div className='min-h-screen bg-background'>
       {/* Hero Section */}
@@ -55,10 +48,10 @@ const AuthPage = () => {
             </p>
           </div>
 
-          <div className='flex flex-col sm:flex-row gap-4 justify-center mb-12 mt-6'>
+          <div className='flex flex-row gap-4 justify-center mb-12 mt-6'>
             <Button
               size='lg'
-              className='text-lg px-8 py-6 bg-primary hover:bg-primary/90'
+              className='w-auto text-lg px-8 py-6 bg-primary hover:bg-primary/90'
               asChild>
               <a
                 href='#roles'
@@ -76,7 +69,7 @@ const AuthPage = () => {
             <Button
               variant='outline'
               size='lg'
-              className='text-lg px-8 py-6 bg-secondary/20 hover:bg-primary/10'>
+              className='w-auto text-lg px-8 py-6 bg-secondary/20 hover:bg-primary/10'>
               Learn More
             </Button>
           </div>
@@ -84,7 +77,7 @@ const AuthPage = () => {
       </section>
 
       {/* Role Selection Section */}
-      <section className='py-20 bg-muted/30'>
+      <section className='py-12 md:py-20 bg-muted/30'>
         <div className='container mx-auto px-4'>
           <div className='text-center mb-16'>
             <h2 className='text-4xl md:text-5xl font-bold mb-6'>
@@ -110,7 +103,10 @@ const AuthPage = () => {
                       ? 'border-primary ring-2 ring-primary/20'
                       : 'border-border hover:border-primary/50'
                   }`}
-                  onClick={() => setSelectedRole(role.id)}>
+                  onClick={() => {
+                    setSelectedRole(role.id)
+                    navigate(`/auth?role=${role.id}`)
+                  }}>
                   <div
                     className={`absolute inset-0 opacity-10 bg-gradient-to-br ${role.color}`}
                   />
@@ -165,7 +161,7 @@ const AuthPage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className='py-20 bg-gradient-to-br from-purple-50 to-pink-50'>
+      <section className='py-12 md:py-20 bg-gradient-to-br from-purple-50 to-pink-50'>
         <div className='container mx-auto px-4'>
           <div className='text-center mb-16'>
             <h2 className='text-4xl md:text-5xl font-bold mb-6'>
@@ -177,7 +173,7 @@ const AuthPage = () => {
             </p>
           </div>
 
-          <div className='grid md:grid-cols-3 gap-8'>
+          <div className='grid sm:grid-cols-2 md:grid-cols-3 gap-8'>
             <div className='text-center group'>
               <div className='w-20 h-20 rounded-full bg-gradient-to-r from-orange-600 to-amber-500 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300'>
                 <span className='text-2xl font-bold text-white'>1</span>
@@ -221,7 +217,7 @@ const AuthPage = () => {
       </section>
 
       {/* Statistics Section */}
-      <section className='py-20'>
+      <section className='py-12 md:py-20'>
         <div className='container mx-auto px-4'>
           <div className='text-center mb-16'>
             <h2 className='text-4xl md:text-5xl font-bold mb-6'>
@@ -233,7 +229,7 @@ const AuthPage = () => {
             </p>
           </div>
 
-          <div className='grid md:grid-cols-4 gap-8'>
+          <div className='grid sm:grid-cols-2 md:grid-cols-4 gap-8'>
             <div className='text-center'>
               <div className='text-4xl md:text-5xl font-bold text-orange-600 mb-2'>
                 50K+
@@ -269,7 +265,7 @@ const AuthPage = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className='py-20 bg-gradient-to-br from-purple-50 to-pink-50'>
+      <section className='py-12 md:py-20 bg-gradient-to-br from-purple-50 to-pink-50'>
         <div className='container mx-auto px-4'>
           <div className='text-center mb-16'>
             <h2 className='text-4xl md:text-5xl font-bold mb-6'>
@@ -281,7 +277,7 @@ const AuthPage = () => {
             </p>
           </div>
 
-          <div className='grid md:grid-cols-3 gap-8'>
+          <div className='grid sm:grid-cols-2 md:grid-cols-3 gap-8'>
             <Card className='p-6 hover:shadow-lg transition-shadow duration-300'>
               <div className='flex items-center mb-4'>
                 <div className='w-12 h-12 rounded-full bg-gradient-to-r from-orange-600 to-amber-500 flex items-center justify-center mr-4'>
@@ -341,7 +337,7 @@ const AuthPage = () => {
       </section>
 
       {/* Features Section */}
-      <section className='py-20'>
+      <section className='py-12 md:py-20'>
         <div className='container mx-auto px-4'>
           <div className='text-center mb-16'>
             <h2 className='text-4xl md:text-5xl font-bold mb-6'>
@@ -353,7 +349,7 @@ const AuthPage = () => {
             </p>
           </div>
 
-          <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-8'>
+          <div className='grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8'>
             {features.map((feature, index) => {
               const Icon = feature.icon
               return (
@@ -378,7 +374,7 @@ const AuthPage = () => {
 
       {/* CTA Section */}
       <section
-        className='relative py-20 bg-fixed overflow-hidden'
+        className='relative py-16 md:py-20 bg-fixed overflow-hidden'
         style={{
           backgroundImage: `url(${ctaBg})`,
           backgroundSize: 'cover',
@@ -397,121 +393,147 @@ const AuthPage = () => {
           </p>
           <Button
             size='lg'
-            className='text-lg px-12 py-6 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 border-0'
+            className='w-full sm:w-auto text-lg px-12 py-6 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 border-0'
             asChild>
-            <Link to='/auth'>
+            <a
+              href='#roles'
+              onClick={e => {
+                e.preventDefault()
+                rolesSectionRef.current?.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                })
+              }}>
               Get Started Today
               <ArrowRight className='ml-2 h-5 w-5' />
-            </Link>
+            </a>
           </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className='bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 text-gray-800 py-16 border-t border-orange-200'>
+      <footer className='bg-gradient-to-br from-orange-600 via-amber-400 to-orange-600 text-white py-12 md:py-16 border-t border-white/20'>
         <div className='container mx-auto px-4'>
-          <div className='grid md:grid-cols-4 gap-8 mb-8'>
-            <div className='col-span-2'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8'>
+            <div className='col-span-1 lg:col-span-2'>
               <div className='flex justify-start py-1'>
                 <img
                   src={logo}
                   alt='iCaster'
-                  className='h-24 w-auto object-contain'
+                  className='h-20 md:h-24 w-auto object-contain'
                 />
               </div>
-              <p className='text-gray-600 mb-6 max-w-md'>
+              <p className='text-white/80 mb-6 max-w-md'>
                 The premier platform connecting talented artists with casting
                 directors worldwide. Where dreams meet opportunity.
               </p>
               <div className='flex space-x-4'>
-                <div className='w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center hover:bg-orange-200 cursor-pointer transition-colors'>
+                <div className='w-10 h-10 bg-white/10 text-white rounded-full flex items-center justify-center hover:bg-white/20 cursor-pointer transition-colors'>
                   <Star className='h-5 w-5' />
                 </div>
-                <div className='w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center hover:bg-orange-200 cursor-pointer transition-colors'>
+                <div className='w-10 h-10 bg-white/10 text-white rounded-full flex items-center justify-center hover:bg-white/20 cursor-pointer transition-colors'>
                   <Camera className='h-5 w-5' />
                 </div>
-                <div className='w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center hover:bg-orange-200 cursor-pointer transition-colors'>
+                <div className='w-10 h-10 bg-white/10 text-white rounded-full flex items-center justify-center hover:bg-white/20 cursor-pointer transition-colors'>
                   <Music className='h-5 w-5' />
                 </div>
               </div>
             </div>
 
-            <div>
-              <h4 className='font-semibold mb-4 text-orange-600'>
-                For Artists
-              </h4>
-              <ul className='space-y-2 text-gray-700'>
-                <li>
-                  <a href='#' className='hover:text-orange-600 transition-colors'>
-                    Create Portfolio
-                  </a>
-                </li>
-                <li>
-                  <a href='#' className='hover:text-orange-600 transition-colors'>
-                    Find Auditions
-                  </a>
-                </li>
-                <li>
-                  <a href='#' className='hover:text-orange-600 transition-colors'>
-                    Video Submissions
-                  </a>
-                </li>
-                <li>
-                  <a href='#' className='hover:text-orange-600 transition-colors'>
-                    Profile Analytics
-                  </a>
-                </li>
-              </ul>
-            </div>
+            <div className='col-span-1 sm:col-span-2 lg:col-span-2'>
+              <div className='grid grid-cols-2 gap-6'>
+                <div>
+                  <h4 className='font-semibold mb-4 text-white'>For Artists</h4>
+                  <ul className='space-y-2 text-white/80'>
+                    <li>
+                      <a
+                        href='#'
+                        className='hover:text-white transition-colors'>
+                        Create Portfolio
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href='#'
+                        className='hover:text-white transition-colors'>
+                        Find Auditions
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href='#'
+                        className='hover:text-white transition-colors'>
+                        Video Submissions
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href='#'
+                        className='hover:text-white transition-colors'>
+                        Profile Analytics
+                      </a>
+                    </li>
+                  </ul>
+                </div>
 
-            <div>
-              <h4 className='font-semibold mb-4 text-orange-600'>
-                For Recruiters
-              </h4>
-              <ul className='space-y-2 text-gray-700'>
-                <li>
-                  <a href='#' className='hover:text-orange-600 transition-colors'>
-                    Post Casting Calls
-                  </a>
-                </li>
-                <li>
-                  <a href='#' className='hover:text-orange-600 transition-colors'>
-                    Discover Talent
-                  </a>
-                </li>
-                <li>
-                  <a href='#' className='hover:text-orange-600 transition-colors'>
-                    Live Auditions
-                  </a>
-                </li>
-                <li>
-                  <a href='#' className='hover:text-orange-600 transition-colors'>
-                    Subscription Plans
-                  </a>
-                </li>
-              </ul>
+                <div>
+                  <h4 className='font-semibold mb-4 text-white'>
+                    For Recruiters
+                  </h4>
+                  <ul className='space-y-2 text-white/80'>
+                    <li>
+                      <a
+                        href='#'
+                        className='hover:text-white transition-colors'>
+                        Post Casting Calls
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href='#'
+                        className='hover:text-white transition-colors'>
+                        Discover Talent
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href='#'
+                        className='hover:text-white transition-colors'>
+                        Live Auditions
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href='#'
+                        className='hover:text-white transition-colors'>
+                        Subscription Plans
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className='border-t border-orange-200 pt-8 flex flex-col md:flex-row justify-between items-center'>
-            <p className='text-gray-500 text-sm'>
+          <div className='border-t border-white/20 pt-8 flex flex-col md:flex-row justify-between items-start md:items-center'>
+            <p className='text-white/70 text-sm text-center md:text-left'>
               © 2024 iCastar. All rights reserved. Connecting talent with
               opportunity.
             </p>
             <div className='flex space-x-6 mt-4 md:mt-0'>
               <a
                 href='#'
-                className='text-gray-500 hover:text-orange-600 text-sm transition-colors'>
+                className='text-white/70 hover:text-white text-sm transition-colors'>
                 Privacy Policy
               </a>
               <a
                 href='#'
-                className='text-gray-500 hover:text-orange-600 text-sm transition-colors'>
+                className='text-white/70 hover:text-white text-sm transition-colors'>
                 Terms of Service
               </a>
               <a
                 href='#'
-                className='text-gray-500 hover:text-orange-600 text-sm transition-colors'>
+                className='text-white/70 hover:text-white text-sm transition-colors'>
                 Support
               </a>
             </div>
