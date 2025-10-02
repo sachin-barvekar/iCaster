@@ -15,9 +15,14 @@ export interface User {
 }
 
 export interface AuthResponse {
-  token: string
-  refreshToken?: string
-  user: User
+  data: {
+    token: string
+    email: string
+    mobile?: string
+    role: string
+    status: string
+    isVerified: boolean
+  }
 }
 
 export interface LoginRequest {
@@ -28,7 +33,7 @@ export interface LoginRequest {
 export interface RegisterRequest extends LoginRequest {
   firstName: string
   lastName:string
-  phone?: string
+  mobile?: string
   role: string
 }
 
@@ -37,14 +42,13 @@ export const authService = {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
       const response = await api.post<AuthResponse>('/auth/login', credentials)
-      const { token, refreshToken, user } = response.data
+      console.log('Login response:', response.data.data)
+
+      const { token, email, mobile, role, status , isVerified } = response.data.data
 
       // Store tokens and user data
       localStorage.setItem('authToken', token)
-      if (refreshToken) {
-        localStorage.setItem('refreshToken', refreshToken)
-      }
-      localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('user', JSON.stringify({ email, mobile, role, status, isVerified }))
 
       // Set default auth header for future requests
       api.interceptors.request.use(config => {
@@ -54,7 +58,7 @@ export const authService = {
         return config
       })
 
-      return { token, refreshToken, user }
+      return response.data
     } catch (error) {
       console.error('Login failed:', error)
       throw error

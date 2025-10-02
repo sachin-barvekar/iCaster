@@ -1,5 +1,5 @@
 import { useState, type FormEvent, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,13 +12,6 @@ import {
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Eye,
   EyeOff,
@@ -35,24 +28,37 @@ import authService, {
 } from '@/services/userService'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { UserRole } from '@/types/types'
 
 const Auth = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [role, setRole] = useState<'ARTIST' | 'RECRUITER'>('ARTIST')
+  const [mobile, setMobile] = useState('')
+  const [role, setRole] = useState<UserRole>()
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('signin')
   const navigate = useNavigate()
+  const location = useLocation()
 
   // Clear errors when switching tabs
   useEffect(() => {
     setErrors({})
   }, [activeTab])
+
+  // Read role from query param (passed from AuthPage)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const roleParam = params.get('role')
+    if (roleParam === UserRole.ARTIST || roleParam === UserRole.RECRUITER) {
+      setRole(roleParam as UserRole)
+    }
+  }, [location.search])
 
   const validateSignIn = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -76,18 +82,20 @@ const Auth = () => {
     setIsLoading(true)
     try {
       const credentials: LoginRequest = { email, password }
-      const { token, user } = await authService.login(credentials)
+      const { data } = await authService.login(credentials)
 
-      const userRole = user.roles?.[0] || 'artist'
+      const userRole = data?.role as UserRole
       localStorage.setItem('role', userRole)
-      setRole(userRole as 'artist' | 'recruiter')
+      setRole(userRole)
 
       toast.success('You have successfully logged in!')
-      navigate(userRole === 'artist' ? '/onboarding' : '/dashboard')
+      navigate(userRole === UserRole.ARTIST ? '/onboarding' : '/dashboard')
     } catch (error) {
       console.error('Sign in failed:', error)
       const errorMessage =
-        error instanceof Error
+        error instanceof Error && (error as any).response?.data?.message
+          ? (error as any).response.data.message
+          : error instanceof Error
           ? error.message
           : 'Sign in failed. Please try again.'
       toast.error(errorMessage)
@@ -99,16 +107,29 @@ const Auth = () => {
   const validateSignUp = (): boolean => {
     const newErrors: Record<string, string> = {}
 
-    if (!firstName.trim()) {
-      newErrors.name = 'First name is required'
+    const fn = firstName.trim()
+    const ln = lastName.trim()
+    if (!fn) {
+      newErrors.firstName = 'First name is required'
+    } else if (fn.length < 2 || fn.length > 50) {
+      newErrors.firstName = 'First name must be between 2 and 50 characters'
     }
-    if (!lastName.trim()) {
-      newErrors.name = 'Last name is required'
+    if (!ln) {
+      newErrors.lastName = 'Last name is required'
+    } else if (ln.length < 2 || ln.length > 50) {
+      newErrors.lastName = 'Last name must be between 2 and 50 characters'
     }
     if (!email.trim()) {
       newErrors.email = 'Email is required'
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = 'Please enter a valid email'
+    }
+    const rawMobile = mobile.trim()
+    const normalizedMobile = rawMobile.replace(/[\s\-().]/g, '')
+    if (!rawMobile) {
+      newErrors.mobile = 'Mobile number is required'
+    } else if (!/^[1-9]\d{9}$/.test(normalizedMobile)) {
+      newErrors.mobile = 'Invalid mobile number format'
     }
     if (!password) {
       newErrors.password = 'Password is required'
@@ -120,9 +141,6 @@ const Auth = () => {
     } else if (password !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match'
     }
-    if (!role) {
-      newErrors.role = 'Role is required'
-    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -133,26 +151,25 @@ const Auth = () => {
     if (!validateSignUp()) return
     setIsLoading(true)
     try {
+      const rawMobile = mobile.trim()
+      const normalizedMobile = rawMobile.replace(/[\s\-().]/g, '')
       const userData: RegisterRequest = {
         email,
         password,
         firstName,
         lastName,
+        mobile: normalizedMobile,
         role,
       }
       await authService.register(userData)
-
-      const { user } = await authService.login({ email, password })
-      const userRole = user.roles?.[0] || 'artist'
-      localStorage.setItem('role', userRole)
-      setRole(userRole as 'artist' | 'recruiter')
-
       toast.success('Your account has been created successfully!')
-      navigate(userRole === 'artist' ? '/onboarding' : '/dashboard')
+      setActiveTab('signin')
     } catch (error) {
       console.error('Sign up failed:', error)
       const errorMessage =
-        error instanceof Error
+        error instanceof Error && (error as any).response?.data?.message
+          ? (error as any).response.data.message
+          : error instanceof Error
           ? error.message
           : 'Failed to create account. Please try again.'
       toast.error(errorMessage)
@@ -177,7 +194,7 @@ const Auth = () => {
       <div className='absolute bottom-20 right-20 w-40 h-40 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-full blur-xl' />
       <div className='absolute top-1/2 left-10 w-24 h-24 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-full blur-xl' />
 
-      <div className='relative z-10 w-full max-w-md px-4'>
+      <div className='relative z-10 w-full max-w-md px-4 py-8'>
         <Card className='backdrop-blur-lg bg-white/10 border-white/20 shadow-2xl'>
           <CardHeader className='text-center pb-4'>
             <div className='flex justify-center mb-4'>
@@ -196,7 +213,16 @@ const Auth = () => {
           <CardContent>
             <Tabs
               value={activeTab}
-              onValueChange={setActiveTab}
+              onValueChange={(value) => {
+                setActiveTab(value)
+                setEmail('')
+                setPassword('')
+                setConfirmPassword('')
+                setFirstName('')
+                setLastName('')
+                setMobile('')
+                setErrors({})
+              }}
               defaultValue='signin'
               className='w-full'>
               <TabsList className='grid w-full grid-cols-2 bg-white/10 border border-white/20'>
@@ -311,7 +337,7 @@ const Auth = () => {
                       <div className='space-y-2 md:col-span-2'>
                         <div className='flex justify-between items-center'>
                           <Label
-                            htmlFor='signup-firstName'
+                            htmlFor='signup-first-name'
                             className='text-white/90'>
                             First Name
                           </Label>
@@ -322,20 +348,20 @@ const Auth = () => {
                           )}
                         </div>
                         <Input
-                          id='signup-name'
+                          id='signup-first-name'
                           type='text'
                           placeholder='Enter your first name'
                           value={firstName}
                           onChange={e => setFirstName(e.target.value)}
                           className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 ${
-                            errors.name ? 'border-red-500' : ''
+                            errors.firstName ? 'border-red-500' : ''
                           }`}
                         />
                       </div>
                       <div className='space-y-2 md:col-span-2'>
                         <div className='flex justify-between items-center'>
                           <Label
-                            htmlFor='signup-lastName'
+                            htmlFor='signup-last-name'
                             className='text-white/90'>
                             Last Name
                           </Label>
@@ -346,7 +372,7 @@ const Auth = () => {
                           )}
                         </div>
                         <Input
-                          id='signup-name'
+                          id='signup-last-name'
                           type='text'
                           placeholder='Enter your last name'
                           value={lastName}
@@ -358,7 +384,7 @@ const Auth = () => {
                       </div>
 
                       {/* Email Field */}
-                      <div className='space-y-2'>
+                      <div className='space-y-2 md:col-span-2'>
                         <div className='flex justify-between items-center'>
                           <Label
                             htmlFor='signup-email'
@@ -381,47 +407,30 @@ const Auth = () => {
                           }`}
                         />
                       </div>
-
-                      {/* Role Field */}
-                      <div className='space-y-2'>
-                        <div className='flex justify-between items-center'>
-                          <Label
-                            htmlFor='signup-role'
-                            className='text-white/90'>
-                            Role
-                          </Label>
-                          {errors.role && (
-                            <span className='text-xs text-red-400'>
-                              {errors.role}
-                            </span>
-                          )}
-                        </div>
-                        <Select
-                          value={role}
-                          onValueChange={v =>
-                            setRole(v as 'ARTIST' | 'RECRUITER')
-                          }>
-                          <SelectTrigger
-                            id='signup-role'
-                            className='w-full bg-white/10 border border-white/20 text-white px-3 py-2 rounded-lg 
-                     hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
-                     focus:ring-offset-gray-900 transition'>
-                            <SelectValue placeholder='Select your role' />
-                          </SelectTrigger>
-                          <SelectContent className='bg-gray-900 border border-gray-700 text-white rounded-lg shadow-lg'>
-                            <SelectItem
-                              value='ARTIST'
-                              className='cursor-pointer hover:bg-white/10'>
-                              Artist
-                            </SelectItem>
-                            <SelectItem
-                              value='RECRUITER'
-                              className='cursor-pointer hover:bg-white/10'>
-                              Recruiter
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
+                    </div>
+                    {/* Mobile Field */}
+                    <div className='space-y-2'>
+                      <div className='flex justify-between items-center'>
+                        <Label
+                          htmlFor='signup-mobile'
+                          className='text-white/90'>
+                          Mobile
+                        </Label>
+                        {errors.mobile && (
+                          <span className='text-xs text-red-400'>
+                            {errors.mobile}
+                          </span>
+                        )}
                       </div>
+                      <Input
+                        id='signup-mobile'
+                        placeholder='Enter your mobile number'
+                        value={mobile}
+                        onChange={e => setMobile(e.target.value)}
+                        className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 ${
+                          errors.mobile ? 'border-red-500' : ''
+                        }`}
+                      />
                     </div>
 
                     {/* Password Field - Full Width */}
@@ -478,16 +487,30 @@ const Auth = () => {
                           </span>
                         )}
                       </div>
-                      <Input
-                        id='confirm-password'
-                        type='password'
-                        placeholder='Confirm your password'
-                        value={confirmPassword}
-                        onChange={e => setConfirmPassword(e.target.value)}
-                        className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 w-full ${
-                          errors.confirmPassword ? 'border-red-500' : ''
-                        }`}
-                      />
+                      <div className='relative'>
+                        <Input
+                          id='confirm-password'
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          placeholder='Confirm your password'
+                          value={confirmPassword}
+                          onChange={e => setConfirmPassword(e.target.value)}
+                          className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 w-full pr-10 ${
+                            errors.confirmPassword ? 'border-red-500' : ''
+                          }`}
+                        />
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='sm'
+                          className='absolute right-0 top-0 h-full px-3 text-white/60 hover:text-white hover:bg-transparent'
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                          {showConfirmPassword ? (
+                            <EyeOff className='h-4 w-4' />
+                          ) : (
+                            <Eye className='h-4 w-4' />
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   </div>
 

@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
   ArrowRight,
   Users,
@@ -16,77 +15,16 @@ import {
   Music,
   Mic,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import heroBg from '../assets/hero-stage.jpg'
-import logo from '../assets/icaster.png'
-import ctaBg from '../assets/cta-bg.jpg'
+import heroBg from '../../assets/hero-stage.jpg'
+import logo from '../../assets/icaster.png'
+import ctaBg from '../../assets/cta-bg.jpg'
+import { features, roles } from './utils'
 
 const AuthPage = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null)
-
-  const roles = [
-    {
-      id: 'artist',
-      title: 'Artist',
-      subtitle: 'Showcase Your Talent',
-      description:
-        'Create your profile, audition for roles, and connect with top recruiters in the entertainment industry. Build your portfolio and get discovered.',
-      icon: Star,
-      color: 'from-orange-600 to-amber-500',
-      features: [
-        'Digital Portfolio',
-        'Video Auditions',
-        'Direct Messaging',
-        'Profile Analytics',
-        'Casting Alerts',
-      ],
-    },
-    {
-      id: 'recruiter',
-      title: 'Recruiter',
-      subtitle: 'Discover Amazing Talent',
-      description:
-        'Post casting calls, discover talented artists, conduct live auditions, and manage your talent pipeline with powerful tools.',
-      icon: Users,
-      color: 'from-orange-500 to-yellow-400',
-      features: [
-        'Casting Management',
-        'Talent Search',
-        'Live Auditions',
-        'Subscription Plans',
-        'Analytics Dashboard',
-      ],
-    },
-  ]
-
-  const features = [
-    {
-      icon: Camera,
-      title: 'Video Auditions',
-      description:
-        'Record and submit auditions with professional-grade video tools and live streaming capabilities.',
-    },
-    {
-      icon: Music,
-      title: 'Talent Showcase',
-      description:
-        'Create stunning portfolios with photos, videos, and performance reels to showcase your unique talent.',
-    },
-    {
-      icon: Globe,
-      title: 'Global Network',
-      description:
-        'Connect with casting directors, agents, and talent from around the world in one unified platform.',
-    },
-    {
-      icon: Mic,
-      title: 'Live Casting',
-      description:
-        'Participate in real-time casting calls and auditions with interactive features and instant feedback.',
-    },
-  ]
-
+  const rolesSectionRef = useRef<HTMLDivElement>(null)
   return (
     <div className='min-h-screen bg-background'>
       {/* Hero Section */}
@@ -122,10 +60,18 @@ const AuthPage = () => {
               size='lg'
               className='text-lg px-8 py-6 bg-primary hover:bg-primary/90'
               asChild>
-              <Link to='/auth'>
+              <a
+                href='#roles'
+                onClick={e => {
+                  e.preventDefault()
+                  rolesSectionRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  })
+                }}>
                 Get Started
                 <ArrowRight className='ml-2 h-5 w-5' />
-              </Link>
+              </a>
             </Button>
             <Button
               variant='outline'
@@ -150,7 +96,10 @@ const AuthPage = () => {
             </p>
           </div>
 
-          <div className='grid md:grid-cols-2 gap-8 max-w-4xl mx-auto'>
+          <div
+            id='roles'
+            ref={rolesSectionRef}
+            className='grid md:grid-cols-2 gap-8 max-w-4xl mx-auto'>
             {roles.map(role => {
               const Icon = role.icon
               return (
@@ -202,7 +151,7 @@ const AuthPage = () => {
                       className={`w-full mt-6 bg-gradient-to-r ${role.color} hover:opacity-90 transition-all duration-300`}
                       size='lg'
                       asChild>
-                      <Link to='/auth'>
+                      <Link to={`/auth?role=${role.id}`}>
                         Continue as {role.title}
                         <ArrowRight className='ml-2 h-4 w-4' />
                       </Link>
