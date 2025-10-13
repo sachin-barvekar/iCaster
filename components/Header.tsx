@@ -89,6 +89,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [recruiter, setRecruiter] =
     useState<Recruiter>(initialRecruiterData)
   const hasUnreadNotifications = notifications.some(n => !n.read)
+  const role = localStorage.getItem('role')
+  const user = localStorage.getItem('user')
+  console.log(role, user)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -225,7 +228,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               <p className='text-sm font-semibold text-gray-800'>
                 {recruiter.name}
               </p>
-              <p className='text-xs text-gray-500'>{recruiter.title}</p>
+              <p className='text-xs text-gray-500'>{role}</p>
             </div>
             <ChevronDownIcon
               className={`h-5 w-5 text-gray-400 hidden md:block transition-transform ${

@@ -1,27 +1,25 @@
 import React, { useState } from 'react'
 import { ArtistCategory } from '@/types'
-import ActorForm from '@/components/forms/ActorForm'
-import DancerForm, { DancerFormData } from '@/components/forms/DancerForm'
 import CommonFields from '@/components/forms/CommonFields'
-import Icon from '@/components/Icon'
 import { onboardingService } from '@/services/onboardingService'
 
 interface BaseFormData {
   category: ArtistCategory | null
-  fullName: string
-  email: string
-  phone: string
+  artistTypeId?: string | null
   gender: string
   city: string
-  languages: string
+  maritalStatus: string
+  languages: string[] | string
+  experienceYears: string | number
+  dateOfBirth: string
   [key: string]: any
 }
 
 interface ProfileFormProps {
   onNext: () => void
   onBack: () => void
-  formData: BaseFormData & DancerFormData
-  updateFormData: (data: Partial<BaseFormData & DancerFormData>) => void
+  formData: BaseFormData
+  updateFormData: (data: Partial<BaseFormData>) => void
 }
 
 const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
@@ -34,59 +32,23 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {}
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    const phoneRegex = /^[0-9]{10,15}$/
-
-    // Common fields validation
-    if (!formData.fullName?.trim()) newErrors.fullName = 'Full Name is required'
-
-    if (!formData.email?.trim()) {
-      newErrors.email = 'Email is required'
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
-    }
-
-    if (!formData.phone?.trim()) {
-      newErrors.phone = 'Phone number is required'
-    } else if (!phoneRegex.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number (10-15 digits)'
-    }
-
+    if (!formData.category) newErrors.category = 'Artist type is required'
     if (!formData.gender) newErrors.gender = 'Gender is required'
     if (!formData.city?.trim()) newErrors.city = 'City is required'
-    if (!formData.languages?.trim())
-      newErrors.languages = 'Languages known is required'
+    if (!formData.maritalStatus) newErrors.maritalStatus = 'Marital status is required'
 
-    // Verification & Legal validation
-    if (!formData.idProof)
-      newErrors.idProof = 'ID proof is required for verification'
-    if (!formData.consent) {
-      newErrors.consent = 'You must accept the terms and conditions to continue'
-    }
+    const langs = Array.isArray(formData.languages)
+      ? formData.languages
+      : (formData.languages || '')
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+    if (!langs.length) newErrors.languages = 'Languages known is required'
 
-    // Actor specific validations
-    if (formData.category === ArtistCategory.Actor) {
-      if (!formData.age) {
-        newErrors.age = 'Age is required'
-      } else if (
-        isNaN(formData.age) ||
-        formData.age < 1 ||
-        formData.age > 120
-      ) {
-        newErrors.age = 'Please enter a valid age (1-120)'
-      }
+    const exp = Number(formData.experienceYears)
+    if (Number.isNaN(exp) || exp < 0) newErrors.experienceYears = 'Valid years of experience is required'
 
-      if (!formData.height?.trim()) newErrors.height = 'Height is required'
-      if (!formData.weight) newErrors.weight = 'Weight is required'
-    }
-
-    // Dancer specific validations
-    if (formData.category === ArtistCategory.Dancer) {
-      if (!formData.danceStyles?.length)
-        newErrors.danceStyles = 'At least one dance style is required'
-      if (!formData.experienceYears)
-        newErrors.experienceYears = 'Years of experience is required'
-    }
+    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required'
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -97,21 +59,64 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
     if (!validate()) return
 
     try {
-      const formDataToSend = new FormData()
-      
-      // Add all form data to FormData
+      // Build JSON payload instead of FormData
+      const payload: Record<string, any> = {}
+
       Object.entries(formData).forEach(([key, value]) => {
-        if (value instanceof File) {
-          formDataToSend.append(key, value)
-        } else if (Array.isArray(value)) {
-          // Handle array fields like danceStyles
-          value.forEach(item => formDataToSend.append(`${key}[]`, item))
-        } else if (value !== null && value !== undefined) {
-          formDataToSend.append(key, String(value))
+        // Normalize enums for gender and maritalStatus to backend format
+        if (key === 'gender') {
+          const raw = String(value || '').trim()
+          const normalized = raw.toUpperCase().replace(/\s+/g, '_')
+          const allowed = ['MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY']
+          payload['gender'] = allowed.includes(normalized)
+            ? normalized
+            : normalized || ''
+          return
+        }
+
+        if (key === 'maritalStatus') {
+          const raw = String(value || '').trim()
+          let normalized = raw.toUpperCase().replace(/\s+/g, '_')
+          if (normalized === 'OTHER') normalized = 'PREFER_NOT_TO_SAY'
+          const allowed = ['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED', 'PREFER_NOT_TO_SAY']
+          payload['maritalStatus'] = allowed.includes(normalized)
+            ? normalized
+            : normalized || ''
+          return
+        }
+        // Do not send the category name; send the ID under artistTypeId
+        if (key === 'category') return
+
+        if (key === 'artistTypeId') {
+          if (value !== null && value !== undefined) {
+            payload['artistTypeId'] = String(value)
+          }
+          return
+        }
+
+        if (key === 'languages') {
+          const langs = Array.isArray(value)
+            ? value
+            : String(value || '')
+                .split(',')
+                .map(s => s.trim())
+                .filter(Boolean)
+          payload['languages'] = langs
+          return
+        }
+
+        if (key === 'experienceYears') {
+          const num = Number(value)
+          payload['experienceYears'] = Number.isNaN(num) ? value : num
+          return
+        }
+
+        if (value !== null && value !== undefined) {
+          payload[key] = value
         }
       })
 
-      const result = await onboardingService.submitOnboarding(formDataToSend)
+      const result = await onboardingService.submitOnboardingJson(payload)
       console.log('Onboarding successful:', result.message)
     } catch (error) {
       console.error('Onboarding submission failed:', error)
@@ -123,33 +128,7 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
     }
   }
 
-  const renderCategoryForm = () => {
-    switch (formData.category) {
-      case ArtistCategory.Actor:
-        return (
-          <ActorForm
-            formData={formData}
-            updateFormData={updateFormData}
-            errors={errors}
-          />
-        )
-      case ArtistCategory.Dancer:
-        return (
-          <DancerForm
-            formData={formData}
-            updateFormData={updateFormData}
-            errors={errors}
-          />
-        )
-      default:
-        return (
-          <div className='p-4 bg-amber-50 text-amber-800 rounded-lg flex items-center gap-2'>
-            <Icon name='AlertTriangle' />
-            Please select a category first.
-          </div>
-        )
-    }
-  }
+  // Removed role-specific forms; onboarding now captures only common fields
 
   return (
     <div className='bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-4xl mx-auto'>
@@ -163,7 +142,7 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
 
       <form onSubmit={handleSubmit}>
         <div className='space-y-8'>
-          {renderCategoryForm()}
+          {/* {renderCategoryForm()} */}
           <CommonFields
             formData={formData}
             updateFormData={updateFormData}

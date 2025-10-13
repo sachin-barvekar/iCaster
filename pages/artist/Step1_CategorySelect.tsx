@@ -6,7 +6,7 @@ import { toast } from 'react-toastify'
 
 interface CategorySelectProps {
   onNext: () => void
-  updateFormData: (data: { category: ArtistCategory }) => void
+  updateFormData: (data: { artistTypeId: string; category: ArtistCategory }) => void
 }
 
 interface Category {
@@ -19,7 +19,7 @@ interface Category {
 // Fallback categories in case API fails
 const fallbackCategories: Category[] = [
   {
-    id: '1',
+    id: '5',
     name: ArtistCategory.Actor,
     icon: 'User',
     description: 'Acting, modeling, and performance roles.',
@@ -43,7 +43,7 @@ const fallbackCategories: Category[] = [
     description: 'Vocal artists and singers.',
   },
   {
-    id: '5',
+    id: '1',
     name: ArtistCategory.Musician,
     icon: 'Music',
     description: 'Instrumentalists and musicians.',
@@ -86,8 +86,7 @@ const Step1_CategorySelect: React.FC<CategorySelectProps> = ({
 }) => {
   const [categories, setCategories] = useState<Category[]>(fallbackCategories)
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] =
-    useState<ArtistCategory | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -123,9 +122,9 @@ const Step1_CategorySelect: React.FC<CategorySelectProps> = ({
     return iconMap[category] || 'User'
   }
 
-  const handleCategorySelect = (category: ArtistCategory) => {
-    setSelectedCategory(category)
-    updateFormData({ category })
+  const handleCategorySelect = (categoryId: string, categoryName: ArtistCategory) => {
+    setSelectedCategory(categoryId)
+    updateFormData({ artistTypeId: categoryId, category: categoryName })
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -162,8 +161,8 @@ const Step1_CategorySelect: React.FC<CategorySelectProps> = ({
             <CategoryCard
               key={category.id}
               category={category}
-              isSelected={selectedCategory === category.name}
-              onSelect={() => handleCategorySelect(category.name)}
+              isSelected={selectedCategory === category.id}
+              onSelect={() => handleCategorySelect(category.id, category.name)}
             />
           ))}
         </div>

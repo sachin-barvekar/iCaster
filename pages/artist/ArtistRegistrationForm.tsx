@@ -10,9 +10,11 @@ const ArtistRegistrationForm: React.FC = () => {
 
   const [formData, setFormData] = useState<{
     category: ArtistCategory | null
+    artistTypeId: string | null
     [key: string]: any
   }>({
     category: null,
+    artistTypeId: null,
   })
 
   const updateFormData = (data: any) => {

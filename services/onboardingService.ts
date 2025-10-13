@@ -55,6 +55,24 @@ export const onboardingService = {
     }
   },
 
+  async submitOnboardingJson(
+    data: any,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await api.post('/artists/profile', data)
+      return {
+        success: true,
+        message: response.data.message || 'Onboarding completed successfully',
+      }
+    } catch (error: any) {
+      console.error('Onboarding JSON submission failed:', error)
+      throw new Error(
+        error.response?.data?.message ||
+          'Failed to complete onboarding. Please try again.',
+      )
+    }
+  },
+
   async getCategories(): Promise<
     { id: string; name: string; description: string }[]
   > {

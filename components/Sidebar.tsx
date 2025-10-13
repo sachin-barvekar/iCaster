@@ -20,6 +20,7 @@ import {
   XIcon,
 } from './icons/IconComponents'
 import logo from '../assets/icaster.png'
+import { UserRole } from '@/types/types'
 
 interface SidebarProps {
   isOpen: boolean
@@ -31,14 +32,14 @@ const roleBasedNavItems: Record<
   string,
   { page: Page; icon: any; path: string }[]
 > = {
-  recruiter: [
+  [UserRole.RECRUITER]: [
     { page: Page.Dashboard, icon: DashboardIcon, path: '/dashboard' },
     { page: Page.Jobs, icon: BriefcaseIcon, path: '/my-jobs' },
     { page: Page.BrowseArtists, icon: SearchIcon, path: '/artists' },
     { page: Page.ChatCredits, icon: CreditCardIcon, path: '/chat-credits' },
     { page: Page.PastHires, icon: HistoryIcon, path: '/hires' },
   ],
-  artist: [
+  [UserRole.ARTIST]: [
     { page: Page.Dashboard, icon: DashboardIcon, path: '/dashboard' },
     { page: Page.Jobs, icon: BriefcaseIcon, path: '/jobs' },
     { page: Page.Bookmarks, icon: Bookmark, path: '/bookmarks' },
@@ -51,7 +52,7 @@ const roleBasedNavItems: Record<
     { page: Page.Applications, icon: FileText, path: '/applications' },
     { page: Page.Messages, icon: MessageSquare, path: '/messages' },
   ],
-  admin: [
+  [UserRole.ADMIN]: [
     { page: Page.Dashboard, icon: DashboardIcon, path: '/dashboard' },
     { page: Page.BrowseArtists, icon: SearchIcon, path: '/artists' },
     { page: Page.Jobs, icon: BriefcaseIcon, path: '/jobs' },
@@ -63,6 +64,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const role = localStorage.getItem('role')
+  console.log(role)
   const handleNavigation = (path: string) => {
     navigate(path)
     if (window.innerWidth < 1024) {
@@ -80,10 +82,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       }`}>
       <div className='h-20 w-full flex items-center justify-between px-8 shrink-0'>
         <div className='flex items-center'>
-          <img 
-            src={logo} 
+          <img
+            src={logo}
             alt='iCaster'
-            className='h-14 w-full object-contain' 
+            className='h-14 w-full object-contain'
           />
         </div>
         <button
@@ -93,7 +95,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           <XIcon className='h-6 w-6' />
         </button>
       </div>
-      
+
       {/* Separator */}
       <div className='px-4 py-2'>
         <div className='border-t border-gray-200'></div>
@@ -128,7 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       </nav>
 
       {/* Upgrade box only for recruiter role (optional) */}
-      {role === 'recruiter' && (
+      {role === UserRole.RECRUITER && (
         <div className='p-4 shrink-0'>
           <div className='bg-primary-light rounded-lg p-4 text-center'>
             <h3 className='font-semibold text-gray-800'>Upgrade your Plan</h3>

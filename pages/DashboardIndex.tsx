@@ -1,21 +1,18 @@
 import React from 'react'
 import ArtistDashboard from './artist/ArtistDashboard'
 import { RecruiterDashboard } from './recruiter/RecruiterDashboard'
+import { UserRole } from '@/types/types'
 
 const DashboardIndex = () => {
   const role = localStorage.getItem('role')
 
   switch (role) {
-    case 'artist':
+    case UserRole.ARTIST:
       return <ArtistDashboard />
-    case 'recruiter':
+    case UserRole.RECRUITER:
       return <RecruiterDashboard />
     default:
-      return (
-        <div className='text-center p-6'>
-          No dashboard available for your role.
-        </div>
-      )
+      return <ArtistDashboard />
   }
 }
 
