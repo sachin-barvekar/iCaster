@@ -2,13 +2,14 @@ import React, { useState } from 'react'
 import { ArtistCategory } from '@/types'
 import CommonFields from '@/components/forms/CommonFields'
 import { onboardingService } from '@/services/onboardingService'
+import { useNavigate } from 'react-router-dom'
 
 interface BaseFormData {
   category: ArtistCategory | null
   artistTypeId?: string | null
   gender: string
   city: string
-  maritalStatus: string
+
   languages: string[] | string
   experienceYears: string | number
   dateOfBirth: string
@@ -29,13 +30,15 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
   updateFormData,
 }) => {
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const navigate = useNavigate()
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {}
     if (!formData.category) newErrors.category = 'Artist type is required'
     if (!formData.gender) newErrors.gender = 'Gender is required'
     if (!formData.city?.trim()) newErrors.city = 'City is required'
-    if (!formData.maritalStatus) newErrors.maritalStatus = 'Marital status is required'
+
 
     const langs = Array.isArray(formData.languages)
       ? formData.languages
@@ -57,6 +60,7 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!validate()) return
+    setIsSubmitting(true)
 
     try {
       // Build JSON payload instead of FormData
@@ -74,16 +78,6 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
           return
         }
 
-        if (key === 'maritalStatus') {
-          const raw = String(value || '').trim()
-          let normalized = raw.toUpperCase().replace(/\s+/g, '_')
-          if (normalized === 'OTHER') normalized = 'PREFER_NOT_TO_SAY'
-          const allowed = ['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED', 'PREFER_NOT_TO_SAY']
-          payload['maritalStatus'] = allowed.includes(normalized)
-            ? normalized
-            : normalized || ''
-          return
-        }
         // Do not send the category name; send the ID under artistTypeId
         if (key === 'category') return
 
@@ -111,6 +105,9 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
           return
         }
 
+        // Skip deprecated field
+        if (key === 'maritalStatus') return
+
         if (value !== null && value !== undefined) {
           payload[key] = value
         }
@@ -118,13 +115,15 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
 
       const result = await onboardingService.submitOnboardingJson(payload)
       console.log('Onboarding successful:', result.message)
+      navigate('/dashboard')
     } catch (error) {
       console.error('Onboarding submission failed:', error)
-      // You might want to show an error message to the user here
       setErrors(prev => ({
         ...prev,
         form: 'Failed to submit the form. Please try again.'
       }))
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -160,8 +159,17 @@ const Step2_ProfileForm: React.FC<ProfileFormProps> = ({
           <div className='flex flex-col sm:flex-row gap-4 w-full sm:w-auto'>
             <button
               type='submit'
-              className='bg-primary text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-primary/90 transition-all disabled:bg-gray-300 w-full sm:w-auto'>
-              Review & Submit
+              disabled={isSubmitting}
+              aria-busy={isSubmitting}
+              className='bg-primary text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-primary/90 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-70 w-full sm:w-auto'>
+              {isSubmitting ? (
+                <span className='inline-flex items-center gap-2'>
+                  <span className='inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                  Submitting...
+                </span>
+              ) : (
+                'Review & Submit'
+              )}
             </button>
           </div>
         </div>

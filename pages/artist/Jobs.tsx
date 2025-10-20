@@ -13,61 +13,15 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import ApplyJobModal from '@/components/ApplyJobModal'
+import { bookmarksService } from '@/services/bookmarksService'
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog'
 
-const jobData = [
-  {
-    icon: 'Mic',
-    title: 'Lead Singer',
-    company: 'Harmony Studios',
-    location: 'Mumbai',
-    pay: '₹50,000/month',
-    color: 'bg-amber-100 text-amber-800',
-  },
-  {
-    icon: 'Clapperboard',
-    title: 'Voice Over Artist',
-    company: 'SoundWave Productions',
-    location: 'Delhi',
-    pay: '₹35,000/project',
-    color: 'bg-amber-100 text-amber-800',
-  },
-  {
-    icon: 'Palette',
-    title: 'Graphic Designer',
-    company: 'Creative Canvas',
-    location: 'Bangalore',
-    pay: '₹60,000/month',
-    color: 'bg-amber-100 text-amber-800',
-  },
-  {
-    icon: 'Camera',
-    title: 'Fashion Photographer',
-    company: 'Vogue India',
-    location: 'Remote',
-    pay: '₹40,000/shoot',
-    color: 'bg-amber-100 text-amber-800',
-  },
-  {
-    icon: 'Film',
-    title: 'Short Film Actor',
-    company: 'Indie Flicks',
-    location: 'Pune',
-    pay: '₹20,000/project',
-    color: 'bg-amber-100 text-amber-800',
-  },
-  {
-    icon: 'Music',
-    title: 'Session Guitarist',
-    company: 'Melody Makers',
-    location: 'Chennai',
-    pay: '₹15,000/session',
-    color: 'bg-amber-100 text-amber-800',
-  },
-]
 
-type JobCardProps = (typeof jobData)[0] & {
+type JobCardProps = (any)[0] & {
   id?: number
   onApply?: (job: { id?: number; title: string }) => void
+  onBookmark?: (jobId?: number) => void
+  bookmarking?: boolean
 }
 
 const JobCard: React.FC<JobCardProps> = ({
@@ -79,6 +33,8 @@ const JobCard: React.FC<JobCardProps> = ({
   color,
   id,
   onApply,
+  onBookmark,
+  bookmarking,
 }) => (
   <div className='bg-white rounded-2xl shadow-lg p-6 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300'>
     <div>
@@ -103,12 +59,24 @@ const JobCard: React.FC<JobCardProps> = ({
         <Icon name='IndianRupee' size={16} />
         <span>{pay}</span>
       </div>
-      <button
-        onClick={() => onApply && onApply({ id, title })}
-        className='w-full mt-4 bg-gradient-to-r from-primary to-amber-500 text-white font-semibold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all'
-      >
-        Apply Now
-      </button>
+      <div className='flex gap-2 mt-4'>
+        <button
+          onClick={() => onBookmark && onBookmark(id)}
+          disabled={!!bookmarking}
+          className='flex-1 bg-amber-50 text-amber-800 font-semibold text-sm py-2 px-3 rounded-xl hover:bg-amber-100 transition-all'
+        >
+          <span className='inline-flex items-center justify-center gap-2'>
+            <Icon name='Bookmark' size={16} />
+            {bookmarking ? 'Saving...' : 'Bookmark'}
+          </span>
+        </button>
+        <button
+          onClick={() => onApply && onApply({ id, title })}
+          className='flex-1 bg-gradient-to-r from-primary to-amber-500 text-white font-semibold text-sm py-2 px-3 rounded-xl shadow-md hover:shadow-lg transition-all'
+        >
+          Apply Now
+        </button>
+      </div>
     </div>
   </div>
 )
@@ -125,7 +93,7 @@ const FilterButton: React.FC<{ label: string; icon: any }> = ({
 )
 
 const Jobs: React.FC = () => {
-  const [uiJobs, setUiJobs] = useState<typeof jobData>([])
+  const [uiJobs, setUiJobs] = useState<any>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -137,6 +105,9 @@ const Jobs: React.FC = () => {
   const [total, setTotal] = useState(0)
   const [applyOpen, setApplyOpen] = useState(false)
   const [selectedJob, setSelectedJob] = useState<{ id?: number; title?: string } | null>(null)
+const [bookmarkLoadingId, setBookmarkLoadingId] = useState<number | null>(null)
+const [confirmBookmarkOpen, setConfirmBookmarkOpen] = useState(false)
+const [confirmBookmarkJobId, setConfirmBookmarkJobId] = useState<number | null>(null)
 
   const jobTypes: JobType[] = useMemo(
     () => ['FULL_TIME', 'PART_TIME', 'CONTRACT', 'FREELANCE', 'INTERNSHIP', 'PROJECT_BASED'],
@@ -169,7 +140,7 @@ const Jobs: React.FC = () => {
           pay: (j.pay as string) ?? '—',
           color: 'bg-amber-100 text-amber-800',
           id: j.id,
-        })) as typeof jobData
+        })) as any
         setUiJobs(mapped)
         setTotal(t ?? mapped.length)
       } catch (err: any) {
@@ -182,18 +153,37 @@ const Jobs: React.FC = () => {
   }, [currentPage, pageSize, search, jobType, experienceLevel])
 
   const totalPages = Math.max(1, Math.ceil((total || 0) / pageSize))
-  const pageNumbers = useMemo(() => {
-    const nums: (number | '...')[] = []
-    const range = 2
-    let start = Math.max(2, currentPage - range)
-    let end = Math.min(totalPages - 1, currentPage + range)
-    nums.push(1)
-    if (start > 2) nums.push('...')
-    for (let i = start; i <= end; i++) nums.push(i)
-    if (end < totalPages - 1) nums.push('...')
-    if (totalPages > 1) nums.push(totalPages)
-    return nums
-  }, [currentPage, totalPages])
+
+const askBookmark = (jobId?: number) => {
+  if (!jobId) return
+  setConfirmBookmarkJobId(jobId)
+  setConfirmBookmarkOpen(true)
+}
+
+const handleBookmark = async (jobId?: number) => {
+  if (!jobId) return
+  try {
+    setBookmarkLoadingId(jobId)
+    await bookmarksService.bookmarkJob(jobId, {})
+  } catch (err) {
+    console.error('Failed to bookmark job', err)
+  } finally {
+    setBookmarkLoadingId(null)
+  }
+}
+
+const pageNumbers = useMemo(() => {
+  const nums: (number | '...')[] = []
+  const range = 2
+  let start = Math.max(2, currentPage - range)
+  let end = Math.min(totalPages - 1, currentPage + range)
+  nums.push(1)
+  if (start > 2) nums.push('...')
+  for (let i = start; i <= end; i++) nums.push(i)
+  if (end < totalPages - 1) nums.push('...')
+  if (totalPages > 1) nums.push(totalPages)
+  return nums
+}, [currentPage, totalPages])
 
   return (
     <div className='space-y-6'>
@@ -293,6 +283,8 @@ const Jobs: React.FC = () => {
                 setSelectedJob(j)
                 setApplyOpen(true)
               }}
+              onBookmark={(jobId) => askBookmark(jobId)}
+              bookmarking={bookmarkLoadingId === job.id}
             />
           ))
         ) : (
@@ -357,6 +349,32 @@ const Jobs: React.FC = () => {
           </PaginationContent>
         </UIPagination>
       </div>
+
+      <AlertDialog open={confirmBookmarkOpen} onOpenChange={setConfirmBookmarkOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Save this job?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will add the job to your bookmarks.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bookmarkLoadingId !== null}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (confirmBookmarkJobId) {
+                  await handleBookmark(confirmBookmarkJobId)
+                }
+                setConfirmBookmarkOpen(false)
+              }}
+              className='bg-amber-600 hover:bg-amber-700 text-white text-sm h-9 px-3'
+              disabled={bookmarkLoadingId !== null}
+            >
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <ApplyJobModal
         open={applyOpen}

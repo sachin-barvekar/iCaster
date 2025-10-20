@@ -13,7 +13,7 @@ interface FormErrors {
   phone?: string
   gender?: string
   city?: string
-  maritalStatus?: string
+
   languages?: string
   experienceYears?: string
   dateOfBirth?: string
@@ -37,25 +37,8 @@ const CommonFields: React.FC<FormProps> = ({
   updateFormData,
   errors = {} as FormErrors,
 }) => {
-  const handleFileUpload = (files: FileList, field: string) => {
-    if (files.length > 0) {
-      const file = files[0]
-      const reader = new FileReader()
-
-      reader.onloadend = () => {
-        const fileData = reader.result as string
-        updateFormData({ [field]: fileData })
-      }
-
-      reader.readAsDataURL(file)
-      return true
-    }
-    return false
-  }
-
   return (
     <div className='space-y-8 mt-10 pt-8 border-t'>
-  
       {/* Location & Demographics */}
       <div>
         <h3 className='text-xl font-bold border-b pb-2 mb-6'>
@@ -63,20 +46,24 @@ const CommonFields: React.FC<FormProps> = ({
         </h3>
         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
           <div>
+            <label htmlFor='city' className='block text-sm font-medium mb-2'>City</label>
             <input
+              id='city'
               type='text'
               placeholder='City'
               value={formData.city || ''}
               onChange={e => updateFormData({ city: e.target.value })}
-              className='p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
+              className='h-11 px-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
             />
             {errors.city && (
               <p className='text-red-500 text-sm mt-1'>{errors.city}</p>
             )}
           </div>
           <div>
+            <label htmlFor='gender' className='block text-sm font-medium mb-2'>Gender</label>
             <select
-              className='p-3 border border-gray-300 rounded-lg w-full bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition'
+              id='gender'
+              className='h-11 px-3 border border-gray-300 rounded-lg w-full bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition'
               value={formData.gender || ''}
               onChange={e => updateFormData({ gender: e.target.value })}>
               <option value=''>Select Gender</option>
@@ -89,33 +76,15 @@ const CommonFields: React.FC<FormProps> = ({
               <p className='text-red-500 text-sm mt-1'>{errors.gender}</p>
             )}
           </div>
+
           <div>
-            <select
-              className='p-3 border border-gray-300 rounded-lg w-full bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition'
-              value={formData.maritalStatus || ''}
-              onChange={e => updateFormData({ maritalStatus: e.target.value })}>
-              <option value=''>Marital Status</option>
-              <option value='SINGLE'>Single</option>
-              <option value='MARRIED'>Married</option>
-              <option value='DIVORCED'>Divorced</option>
-              <option value='WIDOWED'>Widowed</option>
-              <option value='PREFER_NOT_TO_SAY'>Prefer not to say</option>
-            </select>
-            {errors.maritalStatus && (
-              <p className='text-red-500 text-sm mt-1'>
-                {errors.maritalStatus}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1.5'>
-              Date of Birth
-            </label>
+            <label htmlFor='dateOfBirth' className='block text-sm font-medium mb-2'>Date of Birth</label>
             <input
               type='date'
+              placeholder='Date of Birth'
               value={formData.dateOfBirth || ''}
               onChange={e => updateFormData({ dateOfBirth: e.target.value })}
-              className='p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
+              className='h-11 px-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
             />
             {errors.dateOfBirth && (
               <p className='text-red-500 text-sm mt-1'>{errors.dateOfBirth}</p>
@@ -158,17 +127,15 @@ const CommonFields: React.FC<FormProps> = ({
 
               return (
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>
-                    Languages Known
-                  </label>
+                  <label className='block text-sm font-medium mb-2'>Languages Known</label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant='outline'
-                        className='w-full justify-between'>
+                        className='h-11 w-full justify-between px-3'>
                         {selectedLanguages.length > 0
                           ? `${selectedLanguages.length} selected`
-                          : 'Select languages'}
+                          : 'Languages Known'}
                         <span className='ml-2 text-gray-400'>▾</span>
                       </Button>
                     </PopoverTrigger>
@@ -196,9 +163,7 @@ const CommonFields: React.FC<FormProps> = ({
                   {selectedLanguages.length > 0 && (
                     <div className='flex flex-wrap gap-2 mt-2'>
                       {selectedLanguages.map(lang => (
-                        <Badge  variant='secondary'>
-                          {lang}
-                        </Badge>
+                        <Badge variant='secondary'>{lang}</Badge>
                       ))}
                     </div>
                   )}
@@ -212,7 +177,9 @@ const CommonFields: React.FC<FormProps> = ({
             })()}
           </div>
           <div>
+            <label htmlFor='experienceYears' className='block text-sm font-medium mb-2'>Years of Experience</label>
             <input
+              id='experienceYears'
               type='number'
               placeholder='Years of Experience'
               min={0}
@@ -221,7 +188,7 @@ const CommonFields: React.FC<FormProps> = ({
               onChange={e =>
                 updateFormData({ experienceYears: e.target.value })
               }
-              className='p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
+              className='h-11 px-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-transparent transition'
             />
             {errors.experienceYears && (
               <p className='text-red-500 text-sm mt-1'>

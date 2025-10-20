@@ -50,7 +50,7 @@ const roleBasedNavItems: Record<
     // },
     { page: Page.Auditions, icon: MicVocal, path: '/auditions' },
     { page: Page.Applications, icon: FileText, path: '/applications' },
-    { page: Page.Messages, icon: MessageSquare, path: '/messages' },
+    // { page: Page.Messages, icon: MessageSquare, path: '/messages' },
   ],
   [UserRole.ADMIN]: [
     { page: Page.Dashboard, icon: DashboardIcon, path: '/dashboard' },
